@@ -37,6 +37,7 @@ function updateStartScreen(){
     $('localVaultHint').classList.toggle('hidden',localStorage.getItem(STORE)===null);
     $('openVaultButton').textContent='📁 Tresor öffnen';
     $('resumeDraftButton').classList.toggle('hidden',localStorage.getItem(DRAFT)===null);
+    $('deleteDraftButton').classList.toggle('hidden',!hasDraft);
 }
 async function identityOf(raw){const bytes=new TextEncoder().encode(raw),digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');}
 function updateSaveStatus(){
@@ -114,6 +115,18 @@ $('discardVaultButton').addEventListener('click',()=>{
     if(!draft||draft.identity!==vaultIdentity||draft.discardEligible!==true){message('Nur ein neu erstellter, noch nie befüllter Tresor kann verworfen werden.');updateSaveStatus();return;}
     if(!confirm('Tresor wirklich verwerfen? Der verschlüsselte Zwischenstand und alle darin enthaltenen, nicht als .enc-Datei exportierten Änderungen werden dauerhaft aus diesem Browser gelöscht. Bereits gespeicherte .enc-Dateien bleiben unverändert.'))return;
     try{const current=JSON.parse(localStorage.getItem(DRAFT)||'null');if(!current||current.identity!==vaultIdentity||current.discardEligible!==true||!discardEligible||decryptedVault.length!==0)throw Error('Zwischenstand ist nicht mehr zum Verwerfen freigegeben.');localStorage.removeItem(DRAFT);if(localStorage.getItem(DRAFT)!==null)throw Error('Zwischenstand konnte nicht gelöscht werden.');dirty=false;lockVault();message('Zwischenstand verworfen. Bereits gespeicherte .enc-Dateien bleiben unverändert.');}catch(e){message('Verwerfen fehlgeschlagen: '+e.message);}
+});
+$('deleteDraftButton').addEventListener('click',()=>{
+    if(busy||$('sourceSelect').classList.contains('hidden'))return;
+    if(localStorage.getItem(DRAFT)===null){updateStartScreen();return;}
+    if(!confirm('Zwischengespeicherten Tresor wirklich löschen? Alle Änderungen, die du noch nicht als .enc-Datei gespeichert hast, gehen unwiderruflich verloren. Bereits gespeicherte .enc-Dateien bleiben unverändert.'))return;
+    try{
+        localStorage.removeItem(DRAFT);
+        if(localStorage.getItem(DRAFT)!==null)throw Error('Zwischenspeicher konnte nicht gelöscht werden.');
+        pendingDraft=null;draftMode=false;fileRawData=null;creatingFromStart=false;
+        updateStartScreen();
+        message('Zwischenspeicher gelöscht. Du kannst wieder einen neuen Tresor erstellen. Gespeicherte .enc-Dateien bleiben unverändert.');
+    }catch(e){message('Löschen fehlgeschlagen: '+e.message);updateStartScreen();}
 });
 $('resumeDraftButton').addEventListener('click',()=>{try{pendingDraft=JSON.parse(localStorage.getItem(DRAFT));if(!pendingDraft?.raw||!pendingDraft?.identity)throw Error();fileRawData=pendingDraft.raw;source='file';draftMode=true;creatingFromStart=false;$('promptTitle').textContent='Zwischengespeicherte Arbeit fortsetzen';updateMasterPrompt();show('passwordPrompt');$('masterPassword').focus();}catch{message('Zwischenstand beschädigt oder nicht verfügbar.');}});
 $('importFile').addEventListener('change',()=>handleSourceSelection('file'));
