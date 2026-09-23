@@ -130,7 +130,7 @@ Achte vor jedem Commit darauf, dass keine persönlichen Tresordateien, Testzugä
 
 ### 1. Anwendung öffnen
 
-Öffne die bereitgestellte GitHub-Pages-URL oder starte die Anwendung in einer geeigneten lokalen Browserumgebung.
+Öffne den Passwortmanager direkt über **[https://tkris.github.io/passwortmanager/](https://tkris.github.io/passwortmanager/)** oder starte die Anwendung in einer geeigneten lokalen Browserumgebung.
 
 Wähle anschließend, ob du den **Browser-Tresor** oder einen **externen Datei-Tresor** öffnen möchtest.
 
