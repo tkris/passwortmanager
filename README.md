@@ -14,7 +14,7 @@ Ein clientseitiger Passwortmanager für PC und Smartphone. Verschlüsselte `.enc
 2. Wähle **„Tresor öffnen“**, um eine vorhandene `.enc`-Datei auszuwählen und mit ihrem Master-Passwort zu entsperren, oder **„Neuen Tresor erstellen“**. Bei der Neuanlage gibst du das Master-Passwort zweimal ein und speicherst den neuen Tresor anschließend als `.enc`-Datei.
 3. Verwalte deine Einträge, nutze Suche, Sortierung und Passwortgenerator. Speichere nach Änderungen eine **aktuelle `.enc`-Datei** und prüfe, ob sie sich öffnen lässt.
 
-**Ein vorhandener Zwischenstand:** Über **„Zwischengespeicherte Arbeit fortsetzen“** kannst du nach erneutem Öffnen der App weiterarbeiten (Master-Passwort erforderlich). Solange ein Zwischenstand vorhanden ist, bleibt **„Neuen Tresor erstellen“** gesperrt. Nach dem Export musst du ausdrücklich bestätigen, dass die Datei tatsächlich gespeichert und geprüft wurde, bevor der Zwischenstand abgeschlossen wird. Danach kannst du den Tresor auf Wunsch direkt sperren oder geöffnet lassen und weiterarbeiten. Über **„Zwischenspeicher löschen“** auf der Startseite kannst du den verschlüsselten Zwischenstand nach ausdrücklicher Bestätigung auch ohne Export endgültig entfernen. Dabei gehen nicht exportierte Änderungen verloren; bereits gespeicherte `.enc`-Dateien bleiben unverändert. Danach kannst du wieder einen neuen Tresor erstellen. Nur bei einem **neu erstellten, noch nie befüllten Tresor** erscheint **„Tresor verwerfen“**. Nach dem ersten hinzugefügten Eintrag oder beim Öffnen einer bestehenden `.enc`-Datei steht diese Aktion nicht zur Verfügung.
+**Ein vorhandener Zwischenstand:** Über **„Zwischengespeicherte Arbeit fortsetzen“** kannst du nach erneutem Öffnen der App weiterarbeiten (Master-Passwort erforderlich). Solange ein Zwischenstand vorhanden ist, bleibt **„Neuen Tresor erstellen“** gesperrt. Beim Speichern wird die `.enc`-Datei ohne anschließende Bestätigungs- oder Sperrfrage zum Download angeboten; der Tresor bleibt geöffnet. Der verschlüsselte Zwischenstand bleibt vorsichtshalber erhalten, bis du ihn auf der Startseite ausdrücklich löschst. Über **„Zwischenspeicher löschen“** auf der Startseite kannst du den verschlüsselten Zwischenstand nach ausdrücklicher Bestätigung auch ohne Export endgültig entfernen. Dabei gehen nicht exportierte Änderungen verloren; bereits gespeicherte `.enc`-Dateien bleiben unverändert. Danach kannst du wieder einen neuen Tresor erstellen. Nur bei einem **neu erstellten, noch nie befüllten Tresor** erscheint **„Tresor verwerfen“**. Nach dem ersten hinzugefügten Eintrag oder beim Öffnen einer bestehenden `.enc`-Datei steht diese Aktion nicht zur Verfügung.
 
 ## ✨ Funktionen
 
@@ -26,7 +26,7 @@ Ein clientseitiger Passwortmanager für PC und Smartphone. Verschlüsselte `.enc
 
 ## 💾 Speicherung und Wiederherstellung
 
-Änderungen werden **verschlüsselt im Browser zwischengespeichert**, aber die ursprünglich ausgewählte `.enc`-Datei wird **nicht automatisch aktualisiert**. Ein gestarteter Download ist kein Nachweis, dass die Datei tatsächlich gespeichert wurde. Prüfe den Download, bevor du eine ältere Datei ersetzt oder den Zwischenstand abschließt.
+Änderungen werden **verschlüsselt im Browser zwischengespeichert**, aber die ursprünglich ausgewählte `.enc`-Datei wird **nicht automatisch aktualisiert**. Ein gestarteter Download ist kein Nachweis, dass die Datei tatsächlich gespeichert wurde. Prüfe den Download, bevor du eine ältere Datei ersetzt oder den Zwischenspeicher ausdrücklich löschst.
 
 Der Zwischenstand ist der ursprünglich geöffneten Datei zugeordnet. Beim erneuten Öffnen kann die App eine Wiederherstellung anbieten. Ein Zwischenstand einer anderen Datei wird nicht stillschweigend überschrieben. Die aktuelle Version unterstützt **nur einen lokalen Zwischenstand gleichzeitig**.
 
@@ -72,7 +72,7 @@ A client-side password manager for desktop and mobile browsers. Encrypted `.enc`
 2. Select **“Tresor öffnen” (Open vault)** to choose an existing `.enc` file and unlock it with its master password, or **“Neuen Tresor erstellen” (Create new vault)**. When creating a vault, enter the master password twice, then save the new vault as an `.enc` file.
 3. Manage entries using search, sorting and the password generator. After making changes, save an **updated `.enc` file** and verify that it can be opened.
 
-**If a local draft exists:** Select **“Zwischengespeicherte Arbeit fortsetzen” (Resume cached work)** to continue after reopening the app (master password required). **Create new vault** is disabled while a draft exists. After exporting, explicitly confirm that the file was saved and checked before finalizing the draft. You can then optionally lock the vault immediately or leave it open to continue working. Use **“Zwischenspeicher löschen” (Delete cached vault)** on the start screen to permanently delete the encrypted draft after explicit confirmation, without exporting it. Unexported changes will be lost, existing `.enc` files remain untouched, and new vault creation becomes available again. **“Tresor verwerfen” (Discard vault)** is available only for a **newly created vault that has never contained an entry**. It disappears after the first entry is added and is not offered for existing `.enc` files.
+**If a local draft exists:** Select **“Zwischengespeicherte Arbeit fortsetzen” (Resume cached work)** to continue after reopening the app (master password required). **Create new vault** is disabled while a draft exists. Saving offers an `.enc` file for download without additional confirmation or lock prompts; the vault stays open. The encrypted draft remains available until you explicitly delete it from the start screen. Use **“Zwischenspeicher löschen” (Delete cached vault)** on the start screen to permanently delete the encrypted draft after explicit confirmation, without exporting it. Unexported changes will be lost, existing `.enc` files remain untouched, and new vault creation becomes available again. **“Tresor verwerfen” (Discard vault)** is available only for a **newly created vault that has never contained an entry**. It disappears after the first entry is added and is not offered for existing `.enc` files.
 
 ## ✨ Features
 
@@ -84,7 +84,7 @@ A client-side password manager for desktop and mobile browsers. Encrypted `.enc`
 
 ## 💾 Saving and recovery
 
-Changes are **cached in encrypted form in the browser**, but the originally selected `.enc` file is **not updated automatically**. Starting a download does not prove the file was saved successfully. Check the downloaded file before replacing an older copy or finalizing the draft.
+Changes are **cached in encrypted form in the browser**, but the originally selected `.enc` file is **not updated automatically**. Starting a download does not prove the file was saved successfully. Check the downloaded file before replacing an older copy or explicitly deleting the cached draft.
 
 The local draft is associated with the file originally opened. The app can offer recovery when that file is reopened. A draft belonging to another file is not silently overwritten. The current version supports **only one local draft at a time**.
 
