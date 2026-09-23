@@ -14,7 +14,7 @@ Ein clientseitiger Passwortmanager für PC und Smartphone. Verschlüsselte `.enc
 2. Wähle **„Tresor öffnen“**, um eine vorhandene `.enc`-Datei auszuwählen und mit ihrem Master-Passwort zu entsperren, oder **„Neuen Tresor erstellen“**. Bei der Neuanlage gibst du das Master-Passwort zweimal ein und speicherst den neuen Tresor anschließend als `.enc`-Datei.
 3. Verwalte deine Einträge, nutze Suche, Sortierung und Passwortgenerator. Speichere nach Änderungen eine **aktuelle `.enc`-Datei** und prüfe, ob sie sich öffnen lässt.
 
-**Ein vorhandener Zwischenstand:** Über **„Zwischengespeicherte Arbeit fortsetzen“** kannst du nach erneutem Öffnen der App weiterarbeiten (Master-Passwort erforderlich). Solange ein Zwischenstand vorhanden ist, bleibt **„Neuen Tresor erstellen“** gesperrt. Nach dem Export musst du ausdrücklich bestätigen, dass die Datei tatsächlich gespeichert und geprüft wurde, bevor der Zwischenstand abgeschlossen wird. Alternativ kannst du den geöffneten Tresor über **„Tresor verwerfen“** nach Bestätigung verwerfen; nicht exportierte Änderungen gehen dabei verloren.
+**Ein vorhandener Zwischenstand:** Über **„Zwischengespeicherte Arbeit fortsetzen“** kannst du nach erneutem Öffnen der App weiterarbeiten (Master-Passwort erforderlich). Solange ein Zwischenstand vorhanden ist, bleibt **„Neuen Tresor erstellen“** gesperrt. Nach dem Export musst du ausdrücklich bestätigen, dass die Datei tatsächlich gespeichert und geprüft wurde, bevor der Zwischenstand abgeschlossen wird. Nur bei einem **neu erstellten, noch nie befüllten Tresor** erscheint **„Tresor verwerfen“**. Nach dem ersten hinzugefügten Eintrag oder beim Öffnen einer bestehenden `.enc`-Datei steht diese Aktion nicht zur Verfügung.
 
 ## ✨ Funktionen
 
@@ -72,7 +72,7 @@ A client-side password manager for desktop and mobile browsers. Encrypted `.enc`
 2. Select **“Tresor öffnen” (Open vault)** to choose an existing `.enc` file and unlock it with its master password, or **“Neuen Tresor erstellen” (Create new vault)**. When creating a vault, enter the master password twice, then save the new vault as an `.enc` file.
 3. Manage entries using search, sorting and the password generator. After making changes, save an **updated `.enc` file** and verify that it can be opened.
 
-**If a local draft exists:** Select **“Zwischengespeicherte Arbeit fortsetzen” (Resume cached work)** to continue after reopening the app (master password required). **Create new vault** is disabled while a draft exists. After exporting, explicitly confirm that the file was saved and checked before finalizing the draft. Alternatively, **“Tresor verwerfen” (Discard vault)** discards the opened vault's local draft after confirmation; changes that were not exported will be lost.
+**If a local draft exists:** Select **“Zwischengespeicherte Arbeit fortsetzen” (Resume cached work)** to continue after reopening the app (master password required). **Create new vault** is disabled while a draft exists. After exporting, explicitly confirm that the file was saved and checked before finalizing the draft. **“Tresor verwerfen” (Discard vault)** is available only for a **newly created vault that has never contained an entry**. It disappears after the first entry is added and is not offered for existing `.enc` files.
 
 ## ✨ Features
 

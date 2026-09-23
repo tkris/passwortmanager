@@ -6,7 +6,7 @@ let vaultIdentity=null, draftMode=false, pendingDraft=null;
 let sessionKey=null, sessionSalt=null, decryptedVault=[], source='', fileRawData=null, busy=false, dirty=false;
 let lastActivity=Date.now(), lockMinutes=Number(localStorage.getItem('vault_lock_minutes')||15);
 let editingIndex=null, revealed=new Set(), clipboardTimer=null;
-let creatingFromStart=false;
+let creatingFromStart=false, discardEligible=false;
 const groups={upper:'ABCDEFGHIJKLMNOPQRSTUVWXYZ',lower:'abcdefghijklmnopqrstuvwxyz',numbers:'0123456789',symbols:'!@#$%^&*()_+-=[]{}|;:,.<>?'};
 function message(text){$('status').textContent=text;}
 function show(id){for(const name of ['sourceSelect','passwordPrompt','vaultView']) $(name).classList.toggle('hidden',name!==id);if(id==='sourceSelect')updateStartScreen();}
@@ -26,7 +26,7 @@ $('togglePassword').addEventListener('click',()=>{
 });
 
 function clearEditor(){setEditorPasswordVisible(false);editingIndex=null;$('entryForm').reset();$('entryTitle').textContent='Passwort hinzufügen';$('entryForm').classList.add('hidden');$('strength').textContent='';}
-function lockVault(reason='manual'){if(active()&&dirty&&reason==='manual'&&!confirm('Änderungen sind noch nicht als .enc-Datei exportiert. Sie bleiben nur verschlüsselt in diesem Browser zwischengespeichert. Trotzdem sperren?'))return;vaultIdentity=null;draftMode=false;pendingDraft=null;creatingFromStart=false;closeSync();sessionKey=null;sessionSalt=null;decryptedVault=[];fileRawData=null;source='';dirty=false;revealed.clear();$('masterPassword').value='';$('masterRepeat').value='';$('importFile').value='';$('passwordsContainer').replaceChildren();$('search').value='';$('changeForm').reset();$('changeForm').classList.add('hidden');clearEditor();show('sourceSelect');if(reason==='automatic'){$('autoLockText').textContent=`Dein Tresor wurde nach ${lockMinutes} ${lockMinutes===1?'Minute':'Minuten'} Inaktivität automatisch gesperrt.`;$('autoLockNotice').classList.remove('hidden');message('');}else{$('autoLockNotice').classList.add('hidden');message('Tresor gesperrt.');}}
+function lockVault(reason='manual'){if(active()&&dirty&&reason==='manual'&&!confirm('Änderungen sind noch nicht als .enc-Datei exportiert. Sie bleiben nur verschlüsselt in diesem Browser zwischengespeichert. Trotzdem sperren?'))return;vaultIdentity=null;draftMode=false;pendingDraft=null;creatingFromStart=false;discardEligible=false;closeSync();sessionKey=null;sessionSalt=null;decryptedVault=[];fileRawData=null;source='';dirty=false;revealed.clear();$('masterPassword').value='';$('masterRepeat').value='';$('importFile').value='';$('passwordsContainer').replaceChildren();$('search').value='';$('changeForm').reset();$('changeForm').classList.add('hidden');clearEditor();show('sourceSelect');if(reason==='automatic'){$('autoLockText').textContent=`Dein Tresor wurde nach ${lockMinutes} ${lockMinutes===1?'Minute':'Minuten'} Inaktivität automatisch gesperrt.`;$('autoLockNotice').classList.remove('hidden');message('');}else{$('autoLockNotice').classList.add('hidden');message('Tresor gesperrt.');}}
 function isCreatingBrowserVault(){return source==='file'&&creatingFromStart;}
 function updateStartScreen(){
     const hasDraft=localStorage.getItem(DRAFT)!==null;
@@ -40,7 +40,7 @@ function updateStartScreen(){
 }
 async function identityOf(raw){const bytes=new TextEncoder().encode(raw),digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');}
 function updateSaveStatus(){
-    $('discardVaultButton').classList.toggle('hidden',source!=='file'||!vaultIdentity||!localStorage.getItem(DRAFT));
+    $('discardVaultButton').classList.toggle('hidden',!(source==='file'&&vaultIdentity&&discardEligible&&decryptedVault.length===0&&localStorage.getItem(DRAFT)));
     $('saveStatus').textContent=dirty?'⚠️ Änderungen nur verschlüsselt im Browser zwischengespeichert – .enc-Datei speichern!':'✓ Keine unexportierten Änderungen bekannt. Prüfe, ob deine letzte .enc-Datei tatsächlich gespeichert wurde.';
 }
 async function saveDraft(entries,key=sessionKey,salt=sessionSalt){
@@ -48,7 +48,8 @@ async function saveDraft(entries,key=sessionKey,salt=sessionSalt){
     const previous=localStorage.getItem(DRAFT);
     if(previous&&JSON.parse(previous).identity!==vaultIdentity)throw Error('Es gibt noch unexportierte Änderungen eines anderen Tresors. Bitte zuerst diesen Zwischenstand öffnen und als .enc-Datei speichern.');
     const raw=JSON.stringify(await PasswordCrypto.encrypt(JSON.stringify(entries),key,salt));
-    localStorage.setItem(DRAFT,JSON.stringify({identity:vaultIdentity,raw,updatedAt:new Date().toISOString()}));
+    discardEligible=discardEligible&&entries.length===0;
+    localStorage.setItem(DRAFT,JSON.stringify({identity:vaultIdentity,raw,updatedAt:new Date().toISOString(),discardEligible}));
     return raw;
 }
 function updateMasterPrompt(){
@@ -64,7 +65,7 @@ function updateMasterPrompt(){
     $('masterSubmit').disabled=creating&&(!first||!repeat||first!==repeat);
 }
 function handleSourceSelection(type){if(busy)return;if(type==='browser'&&!creatingFromStart&&localStorage.getItem(STORE)===null){message('Hier ist noch kein lokal gespeicherter Tresor vorhanden. Bitte einen neuen Tresor erstellen oder eine .enc-Datei öffnen.');show('sourceSelect');return;}if(type==='browser'&&creatingFromStart&&localStorage.getItem(STORE)!==null){message('Es ist bereits ein lokaler Tresor vorhanden. Öffne ihn oder wähle eine .enc-Datei.');show('sourceSelect');return;}$('autoLockNotice').classList.add('hidden');source=type;$('masterPassword').value='';$('masterRepeat').value='';if(type==='file'&&!creatingFromStart){const file=$('importFile').files[0];if(!file)return;if(file.size>10*1024*1024){message('Datei zu groß (max. 10 MB).');return;}const reader=new FileReader();reader.onload=()=>{fileRawData=reader.result;$('promptTitle').textContent='Datei-Tresor öffnen';updateMasterPrompt();show('passwordPrompt');$('masterPassword').focus();};reader.onerror=()=>message('Datei konnte nicht gelesen werden.');reader.readAsText(file);}else{$('promptTitle').textContent=isCreatingBrowserVault()?'Neuen Tresor erstellen':'Gespeicherten Tresor öffnen';updateMasterPrompt();show('passwordPrompt');$('masterPassword').focus();}}
-async function submitMasterPassword(){if(busy)return;const password=$('masterPassword').value;if(!password){message('Master-Passwort eingeben.');return;}const creating=isCreatingBrowserVault();if(creating&&(!$('masterRepeat').value||password!==$('masterRepeat').value)){updateMasterPrompt();message('Bitte das Master-Passwort zweimal identisch eingeben.');return;}busy=true;try{const raw=creating?null:(source==='file'?fileRawData:localStorage.getItem(STORE));let opened,entries;if(raw!==null){opened=await PasswordCrypto.open(JSON.parse(raw),password);entries=JSON.parse(opened.plaintext);if(!Array.isArray(entries)||!entries.every(e=>e&&typeof e.url==='string'&&typeof e.username==='string'&&typeof e.password==='string'))throw Error('Ungültige Einträge');}else{if(!creating)throw Error('Kein gespeicherter Tresor vorhanden.');opened=await PasswordCrypto.create(password);entries=[];fileRawData=JSON.stringify(await PasswordCrypto.encrypt('[]',opened.key,opened.salt));}sessionKey=opened.key;sessionSalt=opened.salt;creatingFromStart=false;decryptedVault=entries;dirty=creating;
+async function submitMasterPassword(){if(busy)return;const password=$('masterPassword').value;if(!password){message('Master-Passwort eingeben.');return;}const creating=isCreatingBrowserVault();if(creating&&(!$('masterRepeat').value||password!==$('masterRepeat').value)){updateMasterPrompt();message('Bitte das Master-Passwort zweimal identisch eingeben.');return;}busy=true;try{const raw=creating?null:(source==='file'?fileRawData:localStorage.getItem(STORE));let opened,entries;if(raw!==null){opened=await PasswordCrypto.open(JSON.parse(raw),password);entries=JSON.parse(opened.plaintext);if(!Array.isArray(entries)||!entries.every(e=>e&&typeof e.url==='string'&&typeof e.username==='string'&&typeof e.password==='string'))throw Error('Ungültige Einträge');}else{if(!creating)throw Error('Kein gespeicherter Tresor vorhanden.');opened=await PasswordCrypto.create(password);entries=[];fileRawData=JSON.stringify(await PasswordCrypto.encrypt('[]',opened.key,opened.salt));}sessionKey=opened.key;sessionSalt=opened.salt;creatingFromStart=false;decryptedVault=entries;dirty=creating;discardEligible=creating;
         vaultIdentity=source==='file'?(draftMode?pendingDraft.identity:await identityOf(fileRawData)):null;
         if(source==='file'&&!creating&&!draftMode){
             const saved=localStorage.getItem(DRAFT);
@@ -74,12 +75,12 @@ async function submitMasterPassword(){if(busy)return;const password=$('masterPas
                         const restored=await PasswordCrypto.open(JSON.parse(draft.raw),password);
                         const recovered=JSON.parse(restored.plaintext);
                         if(!Array.isArray(recovered)||!recovered.every(e=>e&&typeof e.url==='string'&&typeof e.username==='string'&&typeof e.password==='string'))throw Error('Ungültiger Zwischenstand');
-                        decryptedVault=recovered;sessionKey=restored.key;sessionSalt=restored.salt;dirty=true;
+                        decryptedVault=recovered;sessionKey=restored.key;sessionSalt=restored.salt;dirty=true;discardEligible=draft.discardEligible===true&&recovered.length===0;
                     }
                 }
             }
         }
-        if(draftMode){dirty=true;draftMode=false;pendingDraft=null;}
+        if(draftMode){dirty=true;discardEligible=pendingDraft.discardEligible===true&&decryptedVault.length===0;draftMode=false;pendingDraft=null;}
         if(creating){vaultIdentity=await identityOf(fileRawData);await saveDraft(entries);}
         updateSaveStatus();lastActivity=Date.now();$('deleteBrowserVault').classList.toggle('hidden',source!=='browser');show('vaultView');updateSyncButton();$('autoLockNotice').classList.add('hidden');renderPasswords();message(creating?'Neuer Tresor erstellt. Bitte jetzt als .enc-Datei speichern!':dirty?'Zwischenstand wiederhergestellt. Bitte als .enc-Datei speichern!':'Tresor geöffnet.');}catch(e){console.error('Tresor öffnen:',e.name);message('Öffnen fehlgeschlagen: Passwort, Datei oder Speicher prüfen.');}finally{$('masterPassword').value='';$('masterRepeat').value='';busy=false;}}
 
@@ -108,11 +109,11 @@ $('openVaultButton').addEventListener('click',()=>{$('openVaultOptions').classLi
 $('createVaultButton').addEventListener('click',()=>{if(localStorage.getItem(DRAFT)!==null){updateStartScreen();message('Es gibt noch zwischengespeicherte Arbeit. Bitte zuerst fortsetzen, als .enc-Datei speichern und den Abschluss bestätigen.');return;}creatingFromStart=true;source='file';fileRawData=null;$('promptTitle').textContent='Neue .enc-Tresordatei erstellen';$('masterPassword').value='';$('masterRepeat').value='';updateMasterPrompt();show('passwordPrompt');$('masterPassword').focus();});
 $('browserButton').addEventListener('click',()=>{creatingFromStart=false;handleSourceSelection('browser');});
 $('discardVaultButton').addEventListener('click',()=>{
-    if(!active()||busy||source!=='file'||!vaultIdentity)return;
+    if(!active()||busy||source!=='file'||!vaultIdentity||!discardEligible||decryptedVault.length!==0)return;
     let draft;try{draft=JSON.parse(localStorage.getItem(DRAFT)||'null');}catch{message('Zwischenstand konnte nicht gelesen werden.');return;}
-    if(!draft||draft.identity!==vaultIdentity){message('Kein passender Zwischenstand zum Verwerfen gefunden.');return;}
+    if(!draft||draft.identity!==vaultIdentity||draft.discardEligible!==true){message('Nur ein neu erstellter, noch nie befüllter Tresor kann verworfen werden.');updateSaveStatus();return;}
     if(!confirm('Tresor wirklich verwerfen? Der verschlüsselte Zwischenstand und alle darin enthaltenen, nicht als .enc-Datei exportierten Änderungen werden dauerhaft aus diesem Browser gelöscht. Bereits gespeicherte .enc-Dateien bleiben unverändert.'))return;
-    try{const current=JSON.parse(localStorage.getItem(DRAFT)||'null');if(!current||current.identity!==vaultIdentity)throw Error('Zwischenstand hat sich geändert.');localStorage.removeItem(DRAFT);if(localStorage.getItem(DRAFT)!==null)throw Error('Zwischenstand konnte nicht gelöscht werden.');dirty=false;lockVault();message('Zwischenstand verworfen. Bereits gespeicherte .enc-Dateien bleiben unverändert.');}catch(e){message('Verwerfen fehlgeschlagen: '+e.message);}
+    try{const current=JSON.parse(localStorage.getItem(DRAFT)||'null');if(!current||current.identity!==vaultIdentity||current.discardEligible!==true||!discardEligible||decryptedVault.length!==0)throw Error('Zwischenstand ist nicht mehr zum Verwerfen freigegeben.');localStorage.removeItem(DRAFT);if(localStorage.getItem(DRAFT)!==null)throw Error('Zwischenstand konnte nicht gelöscht werden.');dirty=false;lockVault();message('Zwischenstand verworfen. Bereits gespeicherte .enc-Dateien bleiben unverändert.');}catch(e){message('Verwerfen fehlgeschlagen: '+e.message);}
 });
 $('resumeDraftButton').addEventListener('click',()=>{try{pendingDraft=JSON.parse(localStorage.getItem(DRAFT));if(!pendingDraft?.raw||!pendingDraft?.identity)throw Error();fileRawData=pendingDraft.raw;source='file';draftMode=true;creatingFromStart=false;$('promptTitle').textContent='Zwischengespeicherte Arbeit fortsetzen';updateMasterPrompt();show('passwordPrompt');$('masterPassword').focus();}catch{message('Zwischenstand beschädigt oder nicht verfügbar.');}});
 $('importFile').addEventListener('change',()=>handleSourceSelection('file'));
