@@ -71,7 +71,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&active()&
 // Zwei Tresore vergleichen. Der zweite Tresor wird ausschließlich im Arbeitsspeicher geöffnet.
 let syncState=null;
 function updateSyncButton(){
-    $('importVault').classList.toggle('hidden',!active()||source!=='browser');
+    $('importVault').classList.toggle('hidden',!active());
     $('syncToggle').classList.toggle('hidden',!active()||(source==='file'&&localStorage.getItem(STORE)===null));
 }
 function closeSync(){
@@ -85,12 +85,16 @@ function closeSync(){
     $('syncPanel').classList.add('hidden');
     $('syncDiff').classList.add('hidden');
     $('syncMasterStep').classList.add('hidden');
+    $('syncImportDestination').classList.add('hidden');
     $('syncMasterPassword').value='';
     $('syncMasterChoice').value='both';
     $('syncSetup').classList.remove('hidden');
     $('syncRows').replaceChildren();
+    $('syncOnlyOpen').checked=false;
+    $('syncProgress').textContent='';
     $('syncPassword').value='';
     $('syncFile').value='';
+    $('syncSkipBackup').closest('label').classList.remove('hidden');
 }
 function syncKey(e){return JSON.stringify([e.url.trim().toLocaleLowerCase('de'),e.username.trim().toLocaleLowerCase('de')]);}
 function validSyncEntries(entries){
@@ -120,13 +124,18 @@ function syncOpenPanel(){
     $('syncPanel').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
 function importOpenPanel(){
-    if(!active()||busy||source!=='browser')return;
+    if(!active()||busy)return;
     syncOpenPanel();
     $('syncPanelTitle').textContent='📥 Tresor importieren';
-    $('syncIntro').textContent='Wähle die externe .enc-Datei und gib ihr Master-Passwort ein. Nur der Browser-Tresor wird verändert; die externe Datei bleibt unverändert.';
+    $('syncFileLabel').classList.remove('hidden');
+    $('syncIntro').textContent=source==='file'
+        ? 'Wähle eine zweite .enc-Datei und gib deren Master-Passwort ein. Kein Browser-Tresor erforderlich. Die Quelldatei bleibt unverändert.'
+        : 'Wähle die externe .enc-Datei und gib ihr Master-Passwort ein. Nur der Browser-Tresor wird verändert; die externe Datei bleibt unverändert.';
+    $('syncPasswordLabel').firstChild.textContent='Master-Passwort der zu importierenden Datei';
     $('syncApply').textContent='Import prüfen';
     $('syncPanel').dataset.mode='import';
 }
+
 async function syncCompare(){
     if(!active()||busy)return;
     const password=$('syncPassword').value;
@@ -134,7 +143,7 @@ async function syncCompare(){
     busy=true;
     try{
         let browser,external,browserKey,browserSalt,externalKey,externalSalt,originalBrowserRaw,originalExternalRaw;
-        if(source==='browser'){
+        if(source==='browser'||$('syncPanel').dataset.mode==='import'){
             const file=$('syncFile').files[0];
             if(!file||file.size>10*1024*1024)throw Error('Bitte eine .enc-Datei bis 10 MB auswählen.');
             const raw=await file.text();
@@ -144,7 +153,11 @@ async function syncCompare(){
             externalKey=opened.key;externalSalt=opened.salt;
             browser=validSyncEntries(decryptedVault);
             browserKey=sessionKey;browserSalt=sessionSalt;
-            originalBrowserRaw=localStorage.getItem(STORE);
+            originalBrowserRaw=source==='browser'?localStorage.getItem(STORE):null;
+            if(source==='file'){
+                // Im Datei-Import bezeichnet die linke Diff-Seite den geöffneten Tresor.
+                originalExternalRaw=fileRawData;
+            }
         }else{
             originalBrowserRaw=localStorage.getItem(STORE);
             if(originalBrowserRaw===null)throw Error('Kein Browser-Tresor vorhanden.');
@@ -165,7 +178,7 @@ async function syncCompare(){
             if(b&&e&&b.url===e.url&&b.username===e.username&&b.password===e.password)continue;
             differences.push({key,b,e,choice:b&&!e?'browser':e&&!b?'external':null});
         }
-        syncState={browser,external,browserKey,browserSalt,externalKey,externalSalt,originalBrowserRaw,originalExternalRaw,differences,mode:$('syncPanel').dataset.mode};
+        syncState={browser,external,browserKey,browserSalt,externalKey,externalSalt,originalBrowserRaw,originalExternalRaw,differences,mode:$('syncPanel').dataset.mode,importTarget:source};
         $('syncPassword').value='';
         renderSyncDiff();
         $('syncSetup').classList.add('hidden');$('syncDiff').classList.remove('hidden');
@@ -183,6 +196,9 @@ function syncSourceChoice(item){
 }
 function syncBulkState(){
     if(!syncState)return;
+    const total=syncState.differences.length;
+    const decided=syncState.differences.filter(d=>d.choice!==null).length;
+    $('syncProgress').textContent=`${decided} von ${total} Unterschieden entschieden`;
     const differences=syncState.differences;
     $('syncTakeAll').checked=!!differences.length&&differences.every(d=>d.choice===syncSourceChoice(d));
     $('syncTakeAll').indeterminate=!$('syncTakeAll').checked&&differences.some(d=>d.choice===syncSourceChoice(d));
@@ -201,18 +217,22 @@ function syncBulkApply(checked){
     renderSyncDiff();
 }
 $('syncTakeAll').addEventListener('change',()=>syncBulkApply($('syncTakeAll').checked));
+$('syncOnlyOpen').addEventListener('change',renderSyncDiff);
 $('syncSkipBackup').addEventListener('change',()=>{
     $('syncBackupWarning').classList.toggle('hidden',!$('syncSkipBackup').checked);
 });
 function renderSyncDiff(){
     const rows=$('syncRows');rows.replaceChildren();
     const differences=syncState.differences;
-    $('syncTakeAllHint').textContent=syncState.mode==='import'?'Quelle: externe .enc-Datei. Bei Konflikten wird die externe Version gewählt.':'Quelle: aktuell geöffneter Tresor. Bei Konflikten wird dessen Version gewählt.';
+    $('syncSkipBackup').closest('label').classList.toggle('hidden',syncState.mode==='import'&&syncState.importTarget==='file');
+    $('syncBackupWarning').classList.toggle('hidden',syncState.mode==='import'&&syncState.importTarget==='file'||!$('syncSkipBackup').checked);
+    $('syncTakeAllHint').textContent=syncState.mode==='import'?'Quelle: zu importierende .enc-Datei (rechts). Bei Konflikten wird die importierte Version gewählt.':'Quelle: aktuell geöffneter Tresor. Bei Konflikten wird dessen Version gewählt.';
     syncBulkState();
     $('syncSummary').textContent=differences.length?`${differences.length} Unterschied(e). Links: Browser-Tresor · Rechts: externe .enc-Datei. Passwörter sind zunächst verborgen.`:'Keine inhaltlichen Unterschiede gefunden. Es wird nichts verändert.';
     $('syncApply').disabled=!differences.length;
-    if(syncState.mode==='import')$('syncSummary').textContent+=' Beim Import wird ausschließlich der Browser-Tresor aktualisiert.';
+    if(syncState.mode==='import')$('syncSummary').textContent+=syncState.importTarget==='file'?' Links: geöffneter Datei-Tresor · Rechts: zu importierende .enc-Datei. Ein Browser-Tresor wird nicht benötigt.':' Beim Import wird ausschließlich der Browser-Tresor aktualisiert.';
     differences.forEach((item,index)=>{
+        if($('syncOnlyOpen').checked&&item.choice!==null)return;
         const wrapper=syncText('article','', 'sync-item');
         wrapper.append(syncText('strong',item.b?.url||item.e.url));
         wrapper.append(syncText('p',item.b?.username||item.e.username,'sync-note'));
@@ -239,11 +259,12 @@ function renderSyncDiff(){
         const choices=item.b&&item.e?[['browser','Browser-Version übernehmen'],['external','Externe Version übernehmen'],['both','Beide Einträge behalten']]:[[item.b?'browser':'external','Fehlenden Eintrag ergänzen'],['skip','Nicht übernehmen']];
         for(const [value,label] of choices){
             const radio=document.createElement('input');radio.type='radio';radio.name='syncChoice'+index;radio.value=value;radio.checked=item.choice===value;
-            radio.addEventListener('change',()=>{item.choice=value;syncBulkState();});
+            radio.addEventListener('change',()=>{item.choice=value;syncBulkState();if($('syncOnlyOpen').checked)renderSyncDiff();});
             const option=syncText('label',label);option.prepend(radio);options.append(option);
         }
         wrapper.append(options);rows.append(wrapper);
     });
+    if(!rows.childElementCount&&$('syncOnlyOpen').checked)rows.append(syncText('p','Keine offenen Konflikte vorhanden.','sync-note'));
 }
 function syncChooseMaster(){
     if(!active()||busy||!syncState)return;
@@ -253,7 +274,14 @@ function syncChooseMaster(){
     if(localStorage.getItem(STORE)!==syncState.originalBrowserRaw){
         message('Browser-Tresor zwischenzeitlich verändert. Vergleich bitte neu starten.');closeSync();return;
     }
-    if(syncState.mode==='import'){importApply();return;}
+    if(syncState.mode==='import'){
+        if(syncState.importTarget==='file'){
+            $('syncDiff').classList.add('hidden');
+            $('syncImportDestination').classList.remove('hidden');
+            $('syncImportDestination').scrollIntoView({behavior:'smooth',block:'nearest'});
+        }else importApply();
+        return;
+    }
     $('syncDiff').classList.add('hidden');
     $('syncMasterStep').classList.remove('hidden');
     $('syncMasterChoice').value='both';
@@ -261,27 +289,57 @@ function syncChooseMaster(){
     syncMasterChoiceChanged();
     $('syncMasterStep').scrollIntoView({behavior:'smooth',block:'nearest'});
 }
-async function importApply(){
-    if(!active()||busy||source!=='browser'||!syncState||syncState.mode!=='import')return;
-    const state=syncState;
-    if(state.differences.some(d=>d.choice===null)){
-        message('Bitte für jeden Konflikt eine Auswahl treffen.');return;
-    }
-    if(localStorage.getItem(STORE)!==state.originalBrowserRaw){
-        message('Browser-Tresor zwischenzeitlich verändert. Import bitte neu starten.');closeSync();return;
-    }
+function mergedImportEntries(state){
     const merged=new Map(state.browser.map(e=>[syncKey(e),e])),extra=[];
     for(const d of state.differences){
         if(d.choice==='skip'||d.choice==='browser')continue;
         if(d.choice==='external')merged.set(d.key,d.e);
         if(d.choice==='both'){
-            let copy={...d.e,username:d.e.username+' (extern)'},n=2;
+            let copy={...d.e,username:d.e.username+' (importiert)'},n=2;
             while(merged.has(syncKey(copy))||extra.some(e=>syncKey(e)===syncKey(copy)))
-                copy={...d.e,username:d.e.username+' (extern '+n+++')'};
+                copy={...d.e,username:d.e.username+' (importiert '+n+++')'};
             extra.push(copy);
         }
     }
-    const result=[...merged.values(),...extra];
+    return [...merged.values(),...extra];
+}
+async function importApply(){
+    if(!active()||busy||!syncState||syncState.mode!=='import')return;
+    const state=syncState;
+    if(state.differences.some(d=>d.choice===null)){
+        message('Bitte für jeden Konflikt eine Auswahl treffen.');return;
+    }
+    if(state.importTarget==='browser'&&localStorage.getItem(STORE)!==state.originalBrowserRaw){
+        message('Browser-Tresor zwischenzeitlich verändert. Import bitte neu starten.');closeSync();return;
+    }
+    if(state.importTarget==='file'&&(source!=='file'||fileRawData!==state.originalExternalRaw)){
+        message('Geöffneter Datei-Tresor zwischenzeitlich verändert. Import bitte neu starten.');closeSync();return;
+    }
+    const result=mergedImportEntries(state);
+    if(state.importTarget==='file'){
+        const destination=document.querySelector('input[name="syncImportDestination"]:checked')?.value;
+        if(!['new','current'].includes(destination))return;
+        if(!confirm(destination==='new'
+            ? `Neue .enc-Datei mit ${result.length} Einträgen erstellen? Der geöffnete Tresor bleibt unverändert.`
+            : `${result.length} Einträge in den geöffneten Tresor übernehmen und eine aktualisierte .enc-Datei herunterladen? Die ursprüngliche Datei wird nicht automatisch überschrieben.`))return;
+        busy=true;
+        try{
+            const encrypted=JSON.stringify(await PasswordCrypto.encrypt(JSON.stringify(result),state.browserKey,state.browserSalt));
+            syncDownload(encrypted,destination==='new'?'passwort_tresor_zusammengefuehrt.enc':'passwort_tresor_aktualisiert.enc');
+            if(destination==='current'){
+                decryptedVault=result;
+                fileRawData=encrypted;
+                dirty=true;
+                revealed.clear();clearEditor();renderPasswords();
+            }
+            closeSync();
+            message(destination==='new'
+                ? 'Neue .enc-Datei zum Download angeboten. Der geöffnete Tresor bleibt unverändert. Bitte den Download prüfen.'
+                : 'Einträge im geöffneten Tresor übernommen. Aktualisierte .enc-Datei zum Download angeboten. Bitte speichern und prüfen; die ursprüngliche Datei bleibt unverändert.');
+        }catch(e){message('Import fehlgeschlagen: '+e.message);}
+        finally{busy=false;}
+        return;
+    }
     if(!confirm(`Import vorbereiten? Der Browser-Tresor wird ${result.length} Einträge enthalten. Die externe Datei bleibt unverändert.`))return;
     busy=true;
     try{
@@ -299,6 +357,7 @@ async function importApply(){
     }catch(e){message('Import fehlgeschlagen: '+e.message);}
     finally{busy=false;}
 }
+
 function syncMasterChoiceChanged(){
     const choice=$('syncMasterChoice').value;
     $('syncMasterPasswordLabel').classList.toggle('hidden',choice==='both');
@@ -387,4 +446,6 @@ $('syncApply').addEventListener('click',syncChooseMaster);
 $('syncMasterChoice').addEventListener('change',syncMasterChoiceChanged);
 $('syncMasterBack').addEventListener('click',()=>{$('syncMasterPassword').value='';$('syncMasterStep').classList.add('hidden');$('syncDiff').classList.remove('hidden');});
 $('syncProceed').addEventListener('click',syncApply);
+$('syncImportProceed').addEventListener('click',importApply);
+$('syncImportBack').addEventListener('click',()=>{$('syncImportDestination').classList.add('hidden');$('syncDiff').classList.remove('hidden');});
 updateSyncButton();
