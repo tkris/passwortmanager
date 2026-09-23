@@ -78,6 +78,10 @@ function closeSync(){
     $('syncPanelTitle').textContent='⇄ Tresore synchronisieren';
     $('syncApply').textContent='Auswahl prüfen und synchronisieren';
     syncState=null;
+    $('syncTakeAll').checked=false;
+    $('syncTakeAll').indeterminate=false;
+    $('syncSkipBackup').checked=false;
+    $('syncBackupWarning').classList.add('hidden');
     $('syncPanel').classList.add('hidden');
     $('syncDiff').classList.add('hidden');
     $('syncMasterStep').classList.add('hidden');
@@ -169,9 +173,42 @@ async function syncCompare(){
     }catch(e){message('Vergleich fehlgeschlagen: '+(e.message==='OperationError'?'Master-Passwort prüfen.':e.message));}
     finally{busy=false;}
 }
+function syncSourceChoice(item){
+    // Bei einem nur einseitig vorhandenen Eintrag wird der vorhandene
+    // Eintrag ergänzt, niemals durch die Sammelauswahl gelöscht.
+    if(!item.b)return 'external';
+    if(!item.e)return 'browser';
+    // Beim Import ist die externe Datei die Quelle, sonst der offene Tresor.
+    return syncState.mode==='import'||source==='file'?'external':'browser';
+}
+function syncBulkState(){
+    if(!syncState)return;
+    const differences=syncState.differences;
+    $('syncTakeAll').checked=!!differences.length&&differences.every(d=>d.choice===syncSourceChoice(d));
+    $('syncTakeAll').indeterminate=!$('syncTakeAll').checked&&differences.some(d=>d.choice===syncSourceChoice(d));
+}
+function syncBulkApply(checked){
+    if(!syncState)return;
+    for(const item of syncState.differences){
+        if(checked){
+            // Nur vorhandene Quell-Einträge auswählen; Einträge, die
+            // ausschließlich auf der Gegenseite liegen, nicht löschen.
+            item.choice=syncSourceChoice(item);
+        }else{
+            item.choice=item.b&&item.e?null:item.b?'browser':'external';
+        }
+    }
+    renderSyncDiff();
+}
+$('syncTakeAll').addEventListener('change',()=>syncBulkApply($('syncTakeAll').checked));
+$('syncSkipBackup').addEventListener('change',()=>{
+    $('syncBackupWarning').classList.toggle('hidden',!$('syncSkipBackup').checked);
+});
 function renderSyncDiff(){
     const rows=$('syncRows');rows.replaceChildren();
     const differences=syncState.differences;
+    $('syncTakeAllHint').textContent=syncState.mode==='import'?'Quelle: externe .enc-Datei. Bei Konflikten wird die externe Version gewählt.':'Quelle: aktuell geöffneter Tresor. Bei Konflikten wird dessen Version gewählt.';
+    syncBulkState();
     $('syncSummary').textContent=differences.length?`${differences.length} Unterschied(e). Links: Browser-Tresor · Rechts: externe .enc-Datei. Passwörter sind zunächst verborgen.`:'Keine inhaltlichen Unterschiede gefunden. Es wird nichts verändert.';
     $('syncApply').disabled=!differences.length;
     if(syncState.mode==='import')$('syncSummary').textContent+=' Beim Import wird ausschließlich der Browser-Tresor aktualisiert.';
@@ -202,7 +239,7 @@ function renderSyncDiff(){
         const choices=item.b&&item.e?[['browser','Browser-Version übernehmen'],['external','Externe Version übernehmen'],['both','Beide Einträge behalten']]:[[item.b?'browser':'external','Fehlenden Eintrag ergänzen'],['skip','Nicht übernehmen']];
         for(const [value,label] of choices){
             const radio=document.createElement('input');radio.type='radio';radio.name='syncChoice'+index;radio.value=value;radio.checked=item.choice===value;
-            radio.addEventListener('change',()=>{item.choice=value;});
+            radio.addEventListener('change',()=>{item.choice=value;syncBulkState();});
             const option=syncText('label',label);option.prepend(radio);options.append(option);
         }
         wrapper.append(options);rows.append(wrapper);
@@ -249,8 +286,9 @@ async function importApply(){
     busy=true;
     try{
         const encrypted=JSON.stringify(await PasswordCrypto.encrypt(JSON.stringify(result),state.browserKey,state.browserSalt));
-        syncDownload(state.originalBrowserRaw,'browser_tresor_sicherung_vor_import.enc');
-        if(!confirm('Sicherung des bisherigen Browser-Tresors wurde zum Download angeboten. Bitte prüfe, ob sie gespeichert ist. Jetzt den Browser-Tresor aktualisieren?')){
+        const skipBackup=$('syncSkipBackup').checked;
+        if(!skipBackup)syncDownload(state.originalBrowserRaw,'browser_tresor_sicherung_vor_import.enc');
+        if(!confirm(skipBackup?'ACHTUNG: Backup überspringen ist aktiviert. Den Browser-Tresor ohne vorherige Sicherung aktualisieren?':'Sicherung des bisherigen Browser-Tresors wurde zum Download angeboten. Bitte prüfe, ob sie gespeichert ist. Jetzt den Browser-Tresor aktualisieren?')){
             message('Import abgebrochen: Browser-Tresor unverändert.');return;
         }
         if(localStorage.getItem(STORE)!==state.originalBrowserRaw)throw Error('Browser-Tresor zwischenzeitlich verändert.');
@@ -315,9 +353,10 @@ async function syncApply(){
         }
         const browserNew=JSON.stringify(await PasswordCrypto.encrypt(JSON.stringify(result),browserKey,browserSalt));
         const externalNew=JSON.stringify(await PasswordCrypto.encrypt(JSON.stringify(result),externalKey,externalSalt));
-        syncDownload(s.originalBrowserRaw,'browser_tresor_sicherung_vor_sync.enc');
+        const skipBackup=$('syncSkipBackup').checked;
+        if(!skipBackup)syncDownload(s.originalBrowserRaw,'browser_tresor_sicherung_vor_sync.enc');
         syncDownload(externalNew,'passwort_tresor_synchronisiert.enc');
-        if(!confirm('Downloads für Browser-Sicherung und neue externe .enc-Datei wurden gestartet. Prüfe, ob BEIDE Dateien gespeichert wurden. Erst dann den Browser-Tresor überschreiben?')){
+        if(!confirm(skipBackup?'ACHTUNG: Backup überspringen ist aktiviert. Prüfe, ob die neue externe .enc-Datei gespeichert wurde. Browser-Tresor OHNE vorherige Sicherung überschreiben?':'Downloads für Browser-Sicherung und neue externe .enc-Datei wurden gestartet. Prüfe, ob BEIDE Dateien gespeichert wurden. Erst dann den Browser-Tresor überschreiben?')){
             message('Abgebrochen: Browser-Tresor unverändert. Die heruntergeladenen Dateien bitte prüfen.');return;
         }
         if(localStorage.getItem(STORE)!==s.originalBrowserRaw)throw Error('Browser-Tresor zwischenzeitlich verändert.');
