@@ -1,3 +1,15 @@
+# Dateibasierter Tresor mit verschlüsseltem Zwischenstand (Testversion)
+
+Die Startansicht bietet **Tresor öffnen**, **Neuen Tresor erstellen** und bei vorhandenem Zwischenstand **Zwischengespeicherte Arbeit fortsetzen**. Ein neuer Tresor muss als `.enc`-Datei heruntergeladen und sicher aufbewahrt werden. Änderungen werden verschlüsselt im Browser zwischengespeichert; **die ursprüngliche `.enc`-Datei wird nicht automatisch aktualisiert**. Über **Tresor als .enc-Datei speichern** wird eine aktuelle Datei zum Download angeboten. Erst nach eigener Prüfung des Downloads darf der Zwischenstand als exportiert markiert werden.
+
+Der Zwischenstand wird an den kryptografischen Fingerabdruck der ursprünglich geöffneten Datei gebunden. Öffnest du diese Datei erneut, kannst du den Zwischenstand wiederherstellen. Ein Zwischenstand zu einer anderen Datei wird nicht stillschweigend überschrieben. Über **Zwischengespeicherte Arbeit fortsetzen** lässt sich die letzte lokale Arbeit auch ohne erneute Auswahl der ursprünglichen Datei öffnen (Master-Passwort erforderlich). Es gibt derzeit **nur einen** lokalen Zwischenstand gleichzeitig.
+
+Ein früherer Browser-Tresor kann unter **Tresor öffnen → Alten Browser-Tresor für Export öffnen** geöffnet und als `.enc` exportiert werden. Lösche den alten Tresor erst, nachdem du die Datei erfolgreich geöffnet und überprüft hast. Zwei `.enc`-Dateien können im geöffneten Tresor über „Tresore synchronisieren“ manuell verglichen und zusammengeführt werden. Die Quelldateien werden nicht automatisch überschrieben.
+
+**Wichtig:** Der Browser-Zwischenspeicher ersetzt kein Backup. Das Löschen von Browserdaten kann nicht exportierte Änderungen vernichten. Ein angestoßener Download beweist nicht, dass die Datei erfolgreich gespeichert wurde. Vor Nutzung mit echten Zugangsdaten die Datei-Erstellung, Bearbeitung, Wiederherstellung, Importfunktion und den Master-Passwort-Wechsel mit Testdaten prüfen.
+
+---
+
 
 # 🔐 Web Passwort Manager (Client-Side Encrypted)
 
@@ -50,9 +62,9 @@ Bei der letzten Option enthalten beide Tresore die synchronisierten Einträge, w
 
 **Hinweis:** Die Anwendung überschreibt die ursprüngliche externe `.enc`-Datei nicht automatisch. Die aktualisierte Datei wird zum Download angeboten und muss anschließend am gewünschten Speicherort abgelegt werden.
 
-### 📥 Tresor importieren
+### 📥 Einträge aus Tresor importieren
 
-Über **„Tresor importieren“** neben **„+ Neues Passwort“** lassen sich Einträge aus einer zweiten verschlüsselten `.enc`-Datei übernehmen – **sowohl in einen geöffneten Browser-Tresor als auch in einen geöffneten externen Datei-Tresor**. Für den Import in einen externen Tresor muss kein Browser-Tresor vorhanden sein.
+Über **„Einträge aus Tresor importieren“** neben **„+ Neues Passwort“** lassen sich Einträge aus einer zweiten verschlüsselten `.enc`-Datei übernehmen – **sowohl in einen geöffneten Browser-Tresor als auch in einen geöffneten externen Datei-Tresor**. Für den Import in einen externen Tresor muss kein Browser-Tresor vorhanden sein.
 
 - Zweite `.enc`-Datei auswählen und mit **ihrem eigenen Master-Passwort** entsperren.
 - Fehlende oder abweichende Einträge in der nebeneinander angeordneten Diff-Ansicht prüfen.
@@ -153,9 +165,9 @@ Füge Einträge hinzu, bearbeite bestehende Zugangsdaten oder erstelle mit dem P
 
 Das Augen-Symbol im Eingabeformular steuert, ob das Passwort sichtbar ist. Ein neu generiertes Passwort wird zunächst angezeigt.
 
-### 4. Tresor importieren
+### 4. Einträge aus Tresor importieren
 
-Öffne deinen **Browser-Tresor oder externen Datei-Tresor** und klicke neben **„+ Neues Passwort“** auf **„Tresor importieren“**. Wähle eine zweite `.enc`-Datei aus und entsperre sie mit ihrem Master-Passwort. Ein Browser-Tresor ist nicht erforderlich, wenn du bereits einen externen Tresor geöffnet hast.
+Öffne deinen **Browser-Tresor oder externen Datei-Tresor** und klicke neben **„+ Neues Passwort“** auf **„Einträge aus Tresor importieren“**. Wähle eine zweite `.enc`-Datei aus und entsperre sie mit ihrem Master-Passwort. Ein Browser-Tresor ist nicht erforderlich, wenn du bereits einen externen Tresor geöffnet hast.
 
 Vergleiche die Unterschiede in der Diff-Ansicht. Bei langen Listen kannst du innerhalb der Eintragsliste scrollen, während die Schaltflächen darunter erreichbar bleiben. Die Fortschrittsanzeige und der Filter **„Nur offene Konflikte“** helfen dir, noch ausstehende Entscheidungen zu finden.
 
@@ -210,3 +222,17 @@ Für Funktionen wie den Zugriff auf die Zwischenablage kann eine sichere Browser
 Der Quellcode und die Benutzeroberfläche dieses Projekts wurden mit Unterstützung einer **Künstlichen Intelligenz (KI)** erstellt und schrittweise erweitert. Dazu gehören unter anderem die Passwortverwaltung, die mobile Bedienung, der Passwortgenerator sowie die Import- und Synchronisierungsfunktionen.
 
 KI-generierter Code sollte vor dem produktiven Einsatz geprüft und getestet werden. Die Verwendung von KI bei der Entwicklung stellt keine unabhängige Sicherheitszertifizierung dar.
+
+
+### Neuen Tresor bei vorhandenem Zwischenstand erstellen
+
+Solange ein verschlüsselter Zwischenstand im Browser vorhanden ist, ist „Neuen Tresor erstellen“ deaktiviert. Setze zuerst die zwischengespeicherte Arbeit fort, speichere die aktuelle `.enc`-Datei und bestätige, dass du sie tatsächlich gespeichert und geprüft hast. Erst nach dieser Bestätigung wird der Zwischenstand entfernt und die Neuanlage wieder freigegeben. Ein bloß gestarteter Download genügt nicht.
+
+### Zwischengespeicherten Tresor verwerfen
+
+Im geöffneten Datei-Tresor erscheint bei vorhandenem Zwischenstand die Schaltfläche **„🗑️ Tresor verwerfen“**. Nach ausdrücklicher Bestätigung wird der verschlüsselte Zwischenstand aus diesem Browser gelöscht und der Tresor gesperrt. **Alle noch nicht als `.enc`-Datei exportierten Änderungen gehen dabei verloren.** Bereits gespeicherte `.enc`-Dateien werden nicht gelöscht oder verändert. Danach kann ein neuer Tresor erstellt werden.
+
+
+### Passwort Manager 2.0: Zwei `.enc`-Dateien abgleichen
+
+Öffne die erste Datei, wähle im Menü **Tresore synchronisieren**, wähle die zweite `.enc`-Datei und gib deren Master-Passwort ein. Entscheide die Unterschiede in der Vergleichsansicht. Das Ergebnis kann als neue `.enc`-Datei heruntergeladen oder in den geöffneten Tresor übernommen und dort verschlüsselt zwischengespeichert werden. **Beide ursprünglichen Dateien bleiben unverändert.** Um beide Speicherorte auf denselben Stand zu bringen, ersetze sie nach Prüfung selbst durch die heruntergeladene zusammengeführte Datei. Die Datei verwendet das Master-Passwort des zuerst geöffneten Tresors.
