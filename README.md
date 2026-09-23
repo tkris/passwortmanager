@@ -11,6 +11,9 @@ Passwörter werden lokal verschlüsselt gespeichert oder als verschlüsselte `.e
 
 ### 🔑 Passwortverwaltung
 
+- **Vereinfachte Startansicht:** Vorhandenen Tresor öffnen oder, falls in diesem Browser noch keiner gespeichert ist, einen neuen erstellen.
+- **Neuen Tresor erstellen:** Master-Passwort zweimal identisch eingeben; ein Hinweis erklärt die ausschließlich lokale Speicherung im aktuellen Browser.
+
 - **Verschlüsselter Browser-Tresor:** Einträge lokal im Browser speichern und mit einem Master-Passwort entsperren.
 - **Externer Datei-Tresor:** Verschlüsselte `.enc`-Dateien öffnen, bearbeiten und aktualisiert exportieren.
 - **Einträge verwalten:** Zugangsdaten hinzufügen, bearbeiten und löschen.
@@ -112,7 +115,7 @@ Die konkreten Parameter und die Verarbeitung der verschlüsselten Daten sollten 
 
 - Die Anwendung benötigt kein Backend, das deine Passwörter verwaltet.
 - Die Entschlüsselung findet im Browser statt.
-- Der Browser-Tresor wird lokal gespeichert.
+- Ein neu erstellter Tresor wird ausschließlich im aktuell verwendeten Browser lokal gespeichert; er ist nicht automatisch auf anderen Geräten oder in anderen Browsern verfügbar.
 - Externe Tresore werden als verschlüsselte `.enc`-Dateien verarbeitet.
 - Die Anwendung muss keine unverschlüsselten Zugangsdaten an einen Server senden.
 
@@ -132,11 +135,15 @@ Achte vor jedem Commit darauf, dass keine persönlichen Tresordateien, Testzugä
 
 Öffne den Passwortmanager direkt über **[https://tkris.github.io/passwortmanager/](https://tkris.github.io/passwortmanager/)** oder starte die Anwendung in einer geeigneten lokalen Browserumgebung.
 
-Wähle anschließend, ob du den **Browser-Tresor** oder einen **externen Datei-Tresor** öffnen möchtest.
+Auf der Startseite stehen **„Tresor öffnen“** und – sofern in diesem Browser noch kein lokaler Tresor vorhanden ist – **„Neuen Tresor erstellen“** zur Verfügung.
 
-### 2. Tresor entsperren
+Über **„Tresor öffnen“** kannst du einen bereits in diesem Browser gespeicherten Tresor entsperren oder eine vorhandene verschlüsselte `.enc`-Datei auswählen. Die Unterscheidung zwischen lokaler Speicherung und Datei bleibt bestehen; nur die Startansicht ist vereinfacht.
 
-Gib das zugehörige Master-Passwort ein. Bei einer externen Datei wählst du zunächst die `.enc`-Datei aus.
+### 2. Tresor erstellen oder öffnen
+
+**Neuen Tresor erstellen:** Wenn noch kein lokaler Tresor in diesem Browser vorhanden ist, wähle **„Neuen Tresor erstellen“**. Lies den Hinweis zur lokalen Speicherung und gib dein Master-Passwort **zweimal identisch** ein. Erst dann kannst du den Tresor anlegen. Der neue Tresor wird ausschließlich in diesem Browser gespeichert und erscheint nicht automatisch auf anderen Geräten oder in anderen Browsern. Wenn bereits ein lokaler Tresor vorhanden ist, wird die Schaltfläche zur Neuanlage ausgeblendet, damit dieser nicht versehentlich überschrieben wird.
+
+**Vorhandenen Tresor öffnen:** Wähle **„Tresor öffnen“** und anschließend den lokal gespeicherten Tresor oder eine externe `.enc`-Datei. Gib zum Entsperren das zugehörige Master-Passwort **einmal** ein. Bei einer externen Datei wählst du diese zuvor aus.
 
 > **Master-Passwort nicht vergessen:** Es gibt keine serverseitige Passwort-zurücksetzen-Funktion. Ohne das passende Master-Passwort kann ein verschlüsselter Tresor in der Regel nicht wiederhergestellt werden.
 
@@ -192,7 +199,7 @@ Für Funktionen wie den Zugriff auf die Zwischenablage kann eine sichere Browser
 - Prüfe bei einem externen Import beide Speicheroptionen mit Testdateien, bevor du eine bisherige Tresordatei ersetzt.
 - Prüfe nach dem Export, ob sich die heruntergeladene `.enc`-Datei mit dem erwarteten Master-Passwort wieder öffnen lässt.
 - Behalte vor größeren Änderungen nach Möglichkeit eine separate Sicherung.
-- Das Löschen des Browser-Tresors oder das Entfernen von Browserdaten kann lokal gespeicherte Einträge unzugänglich machen, wenn keine aktuelle externe Sicherung vorhanden ist.
+- Das Löschen des lokal gespeicherten Tresors oder das Entfernen von Browserdaten kann die dort gespeicherten Einträge unzugänglich machen, wenn keine aktuelle externe Sicherung vorhanden ist.
 - Die Passwortstärke-Anzeige ist eine grobe Orientierung und ersetzt keine umfassende Sicherheitsprüfung.
 - Die Synchronisierung erfolgt **manuell** über die Anwendung, nicht automatisch im Hintergrund.
 
