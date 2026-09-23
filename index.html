@@ -1,327 +1,63 @@
-<!DOCTYPE html>
-<html lang="de">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Passwort Manager</title>
-    <style>
-        body { font-family: sans-serif; background: #0b0f19; color: #f1f5f9; text-align: center; padding: 20px; }
-        section, .security-warning { background: #151b2c; max-width: 400px; margin: 20px auto; padding: 20px; border-radius: 8px; border: 1px solid #1e293b; }
-        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 4px; border: 1px solid #334155; background: #0f172a; color: white; }
-        button { background: #6366f1; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; margin: 5px; font-weight: bold; }
-        button:hover { background: #4f46e5; }
-        .btn-secondary { background: #334155; }
-        .btn-secondary:hover { background: #475569; }
-        .btn-danger { background: #ef4444; }
-        .btn-danger:hover { background: #dc2626; }
-        .password-card { background: #0f172a; padding: 15px; margin: 10px 0; border-radius: 6px; text-align: left; border: 1px solid #1e293b; }
-        .security-warning { border-color: #ef4444; background: #2d1414; }
-        .file-input-label { display: block; background: #1e293b; border: 1px dashed #475569; padding: 15px; border-radius: 6px; cursor: pointer; margin: 10px 0; }
-        .file-input-label:hover { background: #334155; }
-        .hidden { display: none; }
-    </style>
-</head>
-<body>
-    <h1>🔐 Web Passwort Manager</h1>
+<!doctype html>
+<html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Web Passwort Manager</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,sans-serif}*{box-sizing:border-box}body{background:#0b0f19;color:#f1f5f9;max-width:920px;margin:auto;padding:20px}h1{text-align:center}section{background:#151b2c;border:1px solid #29344b;border-radius:12px;padding:22px;margin:18px auto}#sourceSelect,#passwordPrompt{max-width:470px;text-align:center}input,select{background:#0f172a;color:white;border:1px solid #475569;border-radius:6px;padding:10px;max-width:100%;font:inherit}input[type=text],input[type=password],input[type=search]{width:100%;margin:6px 0 12px}input[type=range]{width:65%;vertical-align:middle}input[type=checkbox]{width:auto}button,.file-input-label{background:#6366f1;color:white;border:0;border-radius:6px;padding:10px 13px;cursor:pointer;font:inherit;font-weight:600;margin:3px}button:hover,.file-input-label:hover{filter:brightness(1.15)}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #a5b4fc;outline-offset:2px}.btn-secondary{background:#334155}.btn-danger{background:#b91c1c}.hidden{display:none!important}.password-card{background:#0f172a;border:1px solid #334155;border-radius:9px;padding:14px;margin:12px 0;overflow-wrap:anywhere}.password-card h3{margin:0 0 8px;color:#a5b4fc}.actions,.toolbar,.options{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.actions button{font-size:.9rem}.toolbar>*{flex:1 1 170px}.options label{padding:5px}.file-input-label{display:inline-block}.file-input-label input{display:none}.muted{color:#aab8cd;font-size:.9rem}#status{color:#c7d2fe;text-align:center}#status:empty{display:none}#autoLockNotice{background:#202637;border:1px solid #46537a;border-radius:10px;padding:16px;margin-bottom:20px}#autoLockNotice h2{margin:6px 0 8px;color:#f1f5f9}#autoLockNotice p{margin:0;color:#aab8cd;line-height:1.5}#entryForm,#changeForm{background:#10182a;border:1px solid #334155;border-radius:10px;padding:16px;margin:16px 0}#strength{font-size:.9rem;color:#c7d2fe}footer{color:#aab8cd;font-size:.85rem;text-align:center;margin:25px auto;max-width:680px}
 
-    <!-- BEREICH 1: Quellenauswahl (Erster Schritt) -->
-    <section id="sourceSelect">
-        <h2>Passwort-Tresor auswählen</h2>
-        <p>Wählen Sie aus, woher Ihr verschlüsselter Tresor geladen werden soll.</p>
-        
-        <button onclick="handleSourceSelection('browser')">🌐 Lokal gespeicherten Tresor öffnen</button>
-        
-        <div style="margin: 20px 0; border-top: 1px solid #1e293b; padding-top: 20px;">
-            <p style="font-size: 14px; color: #94a3b8;">...oder verschlüsselte Datei (.enc) laden:</p>
-            <label class="file-input-label">
-                <span>📁 Datei auswählen</span>
-                <input type="file" id="importFile" accept=".enc" style="display: none;" onchange="handleSourceSelection('file')">
-            </label>
-        </div>
-    </section>
+/* Dezentes Tresor-Design und optionale, lokal erzeugte Symbole */
+#vaultView{background:#1b2332;border-color:#344258;border-radius:15px;padding:24px}
+.vault-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:15px}
+.vault-heading h2{margin:0}.icon-option{display:inline-flex;align-items:center;gap:9px;color:#cbd5e1;font-size:.86rem;cursor:pointer}
+.icon-option input{accent-color:#6366f1;width:17px;height:17px;margin:0}
+#vaultView .toolbar{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;margin-bottom:18px}
+#vaultView #search,#vaultView #sort{box-sizing:border-box;min-width:0;width:100%;height:39px;margin:0;padding:7px 12px;background:#1a2230;color:#cbd5e1;border:1px solid #3b4a60;border-radius:8px;font-size:.87rem}
+#vaultView #search::placeholder{color:#929caf}
+#vaultView #search:focus,#vaultView #sort:focus{outline:2px solid #818cf8;outline-offset:1px}
+#vaultView .password-card{display:flex;align-items:center;gap:14px;background:#192231;border-color:#35465d;border-radius:11px;padding:16px;margin:10px 0}
+.entry-main{min-width:0;flex:1 1 230px}.entry-main h3{color:#eef2ff;margin:0 0 7px}.entry-main p{margin:5px 0;color:#cbd5e1;font-size:.9rem}
+.site-mark{flex:0 0 48px;width:48px;height:48px;display:grid;place-items:center;background:#29364a;border-radius:12px;color:#c7d2fe;font-size:1.35rem;font-weight:700}
+#vaultView .password-card .actions{justify-content:flex-end;flex:0 1 auto;gap:7px}
+#vaultView .password-card .actions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;margin:0;padding:9px 11px;background:#263348;border:1px solid #465872;border-radius:8px;color:#dce5f7;font-size:.82rem;font-weight:500}
+#vaultView .password-card .actions button.btn-danger{background:#332431;border-color:#87414d;color:#ff9ca7}
+.action-icon{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#newEntry{margin:0}.entry-buttons{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:22px auto 12px}
+@media(max-width:740px){#vaultView .password-card{flex-wrap:wrap}.entry-main{flex:1 1 calc(100% - 70px)}#vaultView .password-card .actions{flex:1 1 100%;justify-content:flex-start}}
+@media(max-width:480px){#vaultView{padding:14px}#vaultView .toolbar{grid-template-columns:1fr}}
 
-    <!-- BEREICH 2: Dynamische Master-Passwort-Abfrage (Zweiter Schritt) -->
-    <section id="passwordPrompt" class="hidden">
-        <h2 id="promptTitle">Master-Passwort eingeben</h2>
-        <p id="promptDesc">Bitte geben Sie Ihr Passwort ein.</p>
-        <input type="password" id="masterPassword" placeholder="Master-Passwort">
-        <br>
-        <button onclick="submitMasterPassword()">Tresor entschlüsseln</button>
-        <button onclick="goBackToSource()" class="btn-secondary">Zurück</button>
-    </section>
+/* Kompakter Passwortgenerator: Regler und vier Optionen in einer Reihe */
+#entryForm .generator-options{display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:6px;margin:10px 0 12px;width:100%}
+#entryForm .generator-options>label{display:inline-flex;align-items:center;gap:4px;padding:3px 0;white-space:nowrap;font-size:.82rem}
+#entryForm .generator-options .length-option{gap:5px;flex:0 0 auto}
+#entryForm #passwordLength{width:110px;min-width:110px;margin:0;vertical-align:middle;padding:0}
+#entryForm .generator-options input[type=checkbox]{margin:0;flex:none}
+@media(max-width:700px){#entryForm .generator-options{flex-wrap:wrap;justify-content:flex-start;gap:8px 14px}}
 
-    <!-- BEREICH 3: Passwort hinzufügen mit Generator -->
-    <section id="addPassword" class="hidden">
-        <h2>Passwort hinzufügen</h2>
-        <input type="text" id="websiteUrl" placeholder="Website Name / URL">
-        <input type="text" id="username" placeholder="Benutzername / E-Mail">
-        
-        <div style="display: flex; gap: 5px; max-width: 90%; margin: 10px auto; justify-content: center;">
-            <input type="text" id="password" placeholder="Passwort" style="width: 70%; margin: 0;">
-            <button onclick="generateRandomPassword()" style="width: 25%; margin: 0; padding: 5px; font-size: 12px;" class="btn-secondary">Generieren</button>
-        </div>
-        
-        <div style="font-size: 12px; color: #94a3b8; margin: 10px 0;">
-            <label>Länge: <span id="lengthVal">16</span></label>
-            <input type="range" id="passwordLength" min="8" max="32" value="16" style="width: 50%; vertical-align: middle;" oninput="document.getElementById('lengthVal').textContent = this.value">
-        </div>
+/* Sichtbarkeit des Passworts im Editor – unabhängig von „Symbole anzeigen“ */
+.password-input-wrap{position:relative;margin:6px 0 12px}
+#entryForm .password-input-wrap #password{width:100%;margin:0;padding-right:52px}
+#entryForm .password-eye{position:absolute;right:5px;top:50%;transform:translateY(-50%);display:grid;place-items:center;width:38px;height:36px;margin:0;padding:7px;border:0;border-radius:6px;background:transparent;color:#c7d2fe;cursor:pointer}
+#entryForm .password-eye:hover{background:#29364a;filter:none}
+#entryForm .password-eye svg{width:21px;height:21px}
+#entryForm .password-eye .eye-slash{display:none}
+#entryForm .password-eye[aria-pressed="true"] .eye-slash{display:block}
 
-        <button onclick="addPassword()">Speichern</button>
-        <button onclick="document.getElementById('addPassword').style.display = 'none'" class="btn-secondary">Abbrechen</button>
-    </section>
-
-    <!-- BEREICH 4: Liste der Passwörter -->
-    <section id="passwordsList" class="hidden">
-        <h2>Gespeicherte Passwörter</h2>
-        <div id="passwordsContainer"></div>
-        
-        <div style="margin-top: 20px; display: flex; flex-direction: column; gap: 5px;">
-            <button onclick="document.getElementById('addPassword').style.display = 'block'">+ Neues Passwort</button>
-            <button onclick="exportVaultFile()" class="btn-secondary">📥 Als .enc-Datei exportieren</button>
-            <button onclick="deleteAllData()" class="btn-danger">⚠️ Alle Daten löschen</button>
-        </div>
-    </section>
-
-    <div class="security-warning">
-        <h3>⚠️ Sicherheitshinweis</h3>
-        <p>Alle Passwörter werden ausschließlich lokal verschlüsselt verarbeitet.</p>
-        <p>Die exportierte Datei ist stark verschlüsselt und kann sicher in Ihrer Cloud gelagert werden.</p>
-        <p>Bei Verlust Ihres Master-Passworts sind alle Daten unwiederbringlich verloren.</p>
-    </div>
-
-    <!-- Skripte laden -->
-    <script src="crypto.js"></script>
-    <script>
-        let sessionMasterPassword = "";
-        let decryptedVault = [];
-        let selectedSourceType = ""; // "browser" oder "file"
-        let fileRawData = null;
-
-        // Schritt 1: Quelle auswählen - bereitet das Interface vor, fragt aber noch kein PW ab
-        function handleSourceSelection(sourceType) {
-            selectedSourceType = sourceType;
-            const promptTitle = document.getElementById('promptTitle');
-            const promptDesc = document.getElementById('promptDesc');
-
-            if (sourceType === 'file') {
-                const fileInput = document.getElementById('importFile');
-                if (fileInput.files.length === 0) return;
-                
-                const file = fileInput.files[0];
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    fileRawData = e.target.result;
-                    promptTitle.textContent = "Datei-Tresor entschlüsseln";
-                    promptDesc.textContent = "Geben Sie das Master-Passwort für die ausgewählte Datei ein.";
-                    showSection('passwordPrompt');
-                };
-                reader.readAsText(file);
-            } else {
-                // Browser-Speicher prüfen
-                const hasExistingVault = localStorage.getItem('encrypted_vault');
-                if (hasExistingVault) {
-                    promptTitle.textContent = "Browser-Tresor öffnen";
-                    promptDesc.textContent = "Geben Sie Ihr Master-Passwort ein, um den gespeicherten Tresor zu entschlüsseln.";
-                } else {
-                    promptTitle.textContent = "Neuen Tresor anlegen";
-                    promptDesc.textContent = "Es wurde kein Speicher gefunden. Legen Sie jetzt ein sicheres Master-Passwort fest.";
-                }
-                showSection('passwordPrompt');
-            }
-        }
-
-        // Schritt 2: Master-Passwort wurde eingegeben und abgeschickt
-        async function submitMasterPassword() {
-            const masterPassword = document.getElementById('masterPassword').value;
-            if (!masterPassword) return alert('Bitte Master-Passwort eingeben!');
-
-            sessionMasterPassword = masterPassword;
-            let rawDataToDecrypt = null;
-
-            if (selectedSourceType === 'file') {
-                rawDataToDecrypt = fileRawData;
-            } else {
-                rawDataToDecrypt = localStorage.getItem('encrypted_vault');
-            }
-
-            if (rawDataToDecrypt) {
-                try {
-                    const encryptedObject = JSON.parse(rawDataToDecrypt);
-                    const decryptedString = await window.PasswordCrypto.decrypt(encryptedObject, sessionMasterPassword);
-                    decryptedVault = JSON.parse(decryptedString);
-                    alert('Tresor erfolgreich geöffnet!');
-                } catch (error) {
-                    return alert('Falsches Master-Passwort oder Datei beschädigt!');
-                }
-            } else {
-                decryptedVault = [];
-                alert('Neuer leerer Passwort-Tresor wurde erfolgreich angelegt!');
-            }
-
-            // Haupt-UI anzeigen
-            showSection('passwordsList');
-            renderPasswords();
-        }
-
-        function goBackToSource() {
-            document.getElementById('masterPassword').value = '';
-            fileRawData = null;
-            document.getElementById('importFile').value = '';
-            showSection('sourceSelect');
-        }
-
-        function showSection(activeSectionId) {
-            const sections = ['sourceSelect', 'passwordPrompt', 'addPassword', 'passwordsList'];
-            sections.forEach(id => {
-                const el = document.getElementById(id);
-                if (el) {
-                    if (id === activeSectionId) {
-                        el.classList.remove('hidden');
-                    } else if (id === 'addPassword' && activeSectionId === 'passwordsList') {
-                        // Das Hinzufügen-Formular bleibt standardmäßig zu, wenn die Liste aktiv ist
-                        el.classList.add('hidden');
-                    } else if (id !== 'addPassword') {
-                        el.classList.add('hidden');
-                    }
-                }
-            });
-        }
-
-        async function addPassword() {
-            const url = document.getElementById('websiteUrl').value;
-            const username = document.getElementById('username').value;
-            const password = document.getElementById('password').value;
-
-            if (!url || !username || !password) {
-                return alert('Bitte alle Felder ausfüllen!');
-            }
-
-            decryptedVault.push({ url, username, password });
-
-            await saveAndEncryptVault();
-            
-            document.getElementById('websiteUrl').value = '';
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            document.getElementById('addPassword').style.display = 'none';
-            
-            renderPasswords();
-        }
-
-        async function saveAndEncryptVault() {
-            try {
-                const jsonString = JSON.stringify(decryptedVault);
-                const encryptedObject = await window.PasswordCrypto.encrypt(jsonString, sessionMasterPassword);
-                localStorage.setItem('encrypted_vault', JSON.stringify(encryptedObject));
-                return JSON.stringify(encryptedObject);
-            } catch (e) {
-                alert('Fehler beim Verschlüsseln der Daten!');
-                return null;
-            }
-        }
-
-        async function exportVaultFile() {
-            const encryptedString = await saveAndEncryptVault();
-            if (!encryptedString) return;
-
-            const blob = new Blob([encryptedString], { type: "application/json" });
-            const url = URL.createObjectURL(blob);
-            
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "passwort_tresor.enc";
-            document.body.appendChild(a);
-            a.click();
-            
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        function renderPasswords() {
-            const container = document.getElementById('passwordsContainer');
-            container.innerHTML = '';
-
-            if (decryptedVault.length === 0) {
-                container.innerHTML = '<p style="color: #64748b;">Noch keine Passwörter gespeichert.</p>';
-                return;
-            }
-
-            decryptedVault.forEach((entry, i) => {
-                const card = document.createElement('div');
-                card.className = 'password-card';
-                card.innerHTML = `
-                    <h3 style="margin-top:0; color:#6366f1;">${escapeHtml(entry.url)}</h3>
-                    <p style="margin:5px 0;"><strong>User:</strong> ${escapeHtml(entry.username)}</p>
-                    <p style="margin:5px 0;"><strong>Passwort:</strong> <span id="pass-text-${i}">••••••••</span></p>
-                    <button onclick="togglePasswordView(${i})" id="btn-${i}" style="background:#334155; padding:5px 10px; font-size:12px;">Anzeigen</button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function togglePasswordView(index) {
-            const textSpan = document.getElementById(`pass-text-${index}`);
-            const btn = document.getElementById(`btn-${index}`);
-            
-            if (textSpan.textContent === '••••••••') {
-                textSpan.textContent = decryptedVault[index].password;
-                btn.textContent = 'Verbergen';
-            } else {
-                textSpan.textContent = '••••••••';
-                btn.textContent = 'Anzeigen';
-            }
-        }
-
-        function generateRandomPassword() {
-            const length = parseInt(document.getElementById('passwordLength').value) || 16;
-            
-            const charset = {
-                uppercase: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-                lowercase: "abcdefghijklmnopqrstuvwxyz",
-                numbers: "0123456789",
-                symbols: "!@#$%^&*()_+-=[]{}|;:,.<>?"
-            };
-            
-            const allChars = charset.uppercase + charset.lowercase + charset.numbers + charset.symbols;
-            const passwordArray = new Array(length);
-            
-            const randomValues = new Uint32Array(length);
-            window.crypto.getRandomValues(randomValues);
-            
-            passwordArray[0] = charset.uppercase[randomValues[0] % charset.uppercase.length];
-            passwordArray[1] = charset.lowercase[randomValues[1] % charset.lowercase.length];
-            passwordArray[2] = charset.numbers[randomValues[2] % charset.numbers.length];
-            passwordArray[3] = charset.symbols[randomValues[3] % charset.symbols.length];
-            
-            for (let i = 4; i < length; i++) {
-                passwordArray[i] = allChars[randomValues[i] % allChars.length];
-            }
-            
-            const shuffleValues = new Uint32Array(length);
-            window.crypto.getRandomValues(shuffleValues);
-            for (let i = length - 1; i > 0; i--) {
-                const j = shuffleValues[i] % (i + 1);
-                const temp = passwordArray[i];
-                passwordArray[i] = passwordArray[j];
-                passwordArray[j] = temp;
-            }
-            
-            document.getElementById('password').value = passwordArray.join('');
-        }
-
-        function deleteAllData() {
-            if (confirm('Möchten Sie den verschlüsselten Tresor wirklich unwiderruflich aus dem Browser löschen? Sichern Sie vorher Ihre .enc-Datei!')) {
-                localStorage.removeItem('encrypted_vault');
-                location.reload();
-            }
-        }
-
-        function escapeHtml(text) {
-            const div = document.createElement('div');
-            div.textContent = text;
-            return div.innerHTML;
-        }
-    </script>
-</body>
-</html>
+#syncPanel{margin-top:18px;padding:18px;border:1px solid #465872;border-radius:12px;background:#192231;text-align:left}
+#syncPanel h3{margin:0 0 12px}#syncPanel input[type=file],#syncPanel input[type=password]{max-width:100%;box-sizing:border-box}
+#syncPanel .sync-setup{display:grid;gap:10px;margin:12px 0}#syncPanel .sync-setup label{display:grid;gap:5px}
+#syncPanel .sync-diff{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;margin:10px 0}
+#syncPanel .sync-side{padding:10px;border-radius:7px;border:1px solid #40516a;min-width:0;overflow-wrap:anywhere;background:#222e40}
+#syncPanel .sync-side.only{border-color:#32846b;background:#173b36}#syncPanel .sync-side.changed{border-color:#b77a4c;background:#423024}
+#syncPanel .sync-item{border:1px solid #40516a;border-radius:9px;padding:12px;margin:12px 0}
+#syncPanel .sync-choice{display:flex;flex-wrap:wrap;gap:12px;margin:9px 0}#syncPanel .sync-choice label{display:flex;gap:5px;align-items:center}
+#syncPanel .sync-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+#syncPanel .sync-secret{font-family:monospace;overflow-wrap:anywhere}#syncPanel .sync-note{color:#bdc9db;font-size:.88rem}
+@media(max-width:520px){#syncPanel .sync-diff{grid-template-columns:1fr}}
+</style></head><body>
+<h1>🔐 Web Passwort Manager</h1>
+<p id="status" role="status" aria-live="polite"></p>
+<section id="sourceSelect"><div id="autoLockNotice" class="hidden" role="status" aria-live="polite"><div aria-hidden="true" style="font-size:2rem">🔒</div><h2>Tresor gesperrt</h2><p id="autoLockText"></p></div><h2>Passwort-Tresor auswählen</h2><button id="browserButton">🌐 Browser-Tresor öffnen / anlegen</button><p class="muted">Oder verschlüsselte Datei laden:</p><label class="file-input-label">📁 .enc-Datei auswählen <input id="importFile" type="file" accept=".enc"></label></section>
+<section id="passwordPrompt" class="hidden"><h2 id="promptTitle">Master-Passwort</h2><form id="unlockForm"><input id="masterPassword" type="password" autocomplete="off" placeholder="Master-Passwort" required><button type="submit">Bestätigen ↵</button><button id="backButton" type="button" class="btn-secondary">Zurück</button></form></section>
+<section id="vaultView" class="hidden"><div class="vault-heading"><h2>Gespeicherte Passwörter</h2><label class="icon-option"><input id="showIcons" type="checkbox" checked> Symbole anzeigen</label></div><div class="toolbar"><input id="search" type="search" placeholder="Website oder Benutzername suchen" aria-label="Einträge suchen"><select id="sort" aria-label="Einträge sortieren"><option value="url">Website A–Z</option><option value="username">Benutzername A–Z</option><option value="newest">Zuletzt geändert zuerst</option><option value="oldest">Älteste Änderung zuerst</option></select></div><div id="passwordsContainer"></div><div class="entry-buttons"><button id="newEntry" type="button">+ Neues Passwort</button><button id="importVault" type="button" class="btn-secondary hidden">📥 Tresor importieren</button></div>
+<form id="entryForm" class="hidden"><h3 id="entryTitle">Passwort hinzufügen</h3><label>Website / URL<input id="websiteUrl" type="text" required maxlength="500"></label><label>Benutzername / E-Mail<input id="username" type="text" required maxlength="500"></label><label for="password">Passwort</label><div class="password-input-wrap"><input id="password" type="password" required autocomplete="new-password"><button id="togglePassword" type="button" class="password-eye" aria-label="Passwort anzeigen" aria-pressed="false" title="Passwort anzeigen"><svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/><path class="eye-slash" d="M3 3 21 21"/></svg></button></div><div id="strength" aria-live="polite"></div><div class="options generator-options"><label class="length-option">Länge: <output id="lengthVal">20</output> <input id="passwordLength" type="range" min="8" max="64" value="20"></label><label><input id="upper" type="checkbox" checked> Großbuchstaben</label><label><input id="lower" type="checkbox" checked> Kleinbuchstaben</label><label><input id="numbers" type="checkbox" checked> Zahlen</label><label><input id="symbols" type="checkbox" checked> Sonderzeichen</label></div><button id="generate" type="button" class="btn-secondary">Passwort generieren</button><button type="submit">Eintrag speichern</button><button id="entryCancel" type="button" class="btn-secondary">Abbrechen</button></form>
+<hr><h3>⚙️ Einstellungen</h3><label>Automatisch sperren nach <select id="lockMinutes"><option value="1">1 Minute</option><option value="5">5 Minuten</option><option value="10">10 Minuten</option><option value="15">15 Minuten</option><option value="30">30 Minuten</option></select> Inaktivität</label><p><button id="changeToggle" type="button" class="btn-secondary">Master-Passwort ändern</button></p><form id="changeForm" class="hidden"><p class="muted">Vorher Sicherung exportieren. Bei Datei-Tresoren wird eine neue Datei erzeugt.</p><label>Bisheriges Master-Passwort<input id="oldMaster" type="password" autocomplete="off" required></label><label>Neues Master-Passwort (mindestens 12 Zeichen)<input id="newMaster" type="password" autocomplete="new-password" minlength="12" required></label><label>Neues Master-Passwort wiederholen<input id="repeatMaster" type="password" autocomplete="new-password" minlength="12" required></label><button type="submit">Master-Passwort ändern</button></form><hr><div class="actions"><button id="exportButton" class="btn-secondary">📥 .enc-Datei exportieren</button><button id="lockButton" class="btn-secondary">🔒 Tresor sperren</button><button id="deleteBrowserVault" class="btn-danger">Browser-Tresor löschen</button><button id="syncToggle" type="button" class="btn-secondary">⇄ Tresore synchronisieren</button></div><section id="syncPanel" class="hidden" aria-label="Tresore synchronisieren"><h3 id="syncPanelTitle">⇄ Tresore synchronisieren</h3><p id="syncIntro" class="sync-note"></p><div class="sync-setup" id="syncSetup"><label id="syncFileLabel">Externe .enc-Datei auswählen<input id="syncFile" type="file" accept=".enc,application/json"></label><label id="syncPasswordLabel">Master-Passwort des zweiten Tresors<input id="syncPassword" type="password" autocomplete="off"></label><div class="sync-actions"><button id="syncCompare" type="button">Unterschiede anzeigen</button><button id="syncCancel" type="button" class="btn-secondary">Abbrechen</button></div></div><div id="syncDiff" class="hidden"><p id="syncSummary" class="sync-note"></p><div id="syncRows"></div><div class="sync-actions"><button id="syncApply" type="button">Auswahl prüfen und synchronisieren</button><button id="syncBack" type="button" class="btn-secondary">Zurück</button></div></div><div id="syncMasterStep" class="hidden"><h3>Master-Passwörter nach der Synchronisierung</h3><p class="sync-note">Wähle, mit welchem Master-Passwort die beiden Tresore künftig geöffnet werden sollen.</p><label for="syncMasterChoice">Master-Passwort wählen</label><select id="syncMasterChoice"><option value="both">Beide bisherigen Master-Passwörter beibehalten</option><option value="browser">Browser-Master-Passwort für beide verwenden</option><option value="external">Externes Master-Passwort für beide verwenden</option></select><p id="syncMasterExplanation" class="sync-note"></p><label id="syncMasterPasswordLabel" class="hidden"><span id="syncMasterPasswordLabelText">Ausgewähltes Master-Passwort bestätigen</span><input id="syncMasterPassword" type="password" autocomplete="off"></label><div class="sync-actions"><button id="syncProceed" type="button">Synchronisierung vorbereiten</button><button id="syncMasterBack" type="button" class="btn-secondary">Zurück zur Diff-Ansicht</button></div></div></section></section>
+<footer>Die Daten werden lokal verarbeitet. Bei eingeschleustem JavaScript oder kompromittiertem Browser können Passwörter einer geöffneten Sitzung ausgelesen werden. Sichere deine .enc-Datei getrennt und verwende ein starkes Master-Passwort.</footer>
+<script src="crypto_neu.js"></script><script src="app.js"></script></body></html>
