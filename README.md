@@ -34,6 +34,8 @@ Der Browser-Tresor und ein externer `.enc`-Tresor können miteinander abgegliche
 - Mit **„Alle von Quelle übernehmen“** mehrere Unterschiede auf einmal auswählen.
 - Sammelauswahlen vor dem Speichern für einzelne Einträge anpassen.
 - Die geplanten Änderungen vor dem Abschluss überprüfen und bestätigen.
+- Auch bei vielen Einträgen übersichtlich arbeiten: Die Unterschiedsliste ist separat scrollbar, während die Aktionsschaltflächen darunter erreichbar bleiben.
+- Den Fortschritt der Entscheidungen sehen und mit **„Nur offene Konflikte“** gezielt noch nicht entschiedene Unterschiede anzeigen.
 
 Nach der Auswahl der Einträge kann festgelegt werden, welche Master-Passwörter künftig verwendet werden sollen:
 
@@ -47,19 +49,28 @@ Bei der letzten Option enthalten beide Tresore die synchronisierten Einträge, w
 
 ### 📥 Tresor importieren
 
-Über **„Tresor importieren“** neben **„+ Neues Passwort“** lassen sich Einträge aus einer externen `.enc`-Datei in den geöffneten Browser-Tresor übernehmen.
+Über **„Tresor importieren“** neben **„+ Neues Passwort“** lassen sich Einträge aus einer zweiten verschlüsselten `.enc`-Datei übernehmen – **sowohl in einen geöffneten Browser-Tresor als auch in einen geöffneten externen Datei-Tresor**. Für den Import in einen externen Tresor muss kein Browser-Tresor vorhanden sein.
 
-- Externe Datei auswählen und mit ihrem Master-Passwort entsperren.
-- Zu importierende Einträge in der Diff-Ansicht überprüfen.
-- Konflikte einzeln oder über **„Alle von Quelle übernehmen“** bearbeiten.
-- Den Import vor dem Speichern bestätigen.
+- Zweite `.enc`-Datei auswählen und mit **ihrem eigenen Master-Passwort** entsperren.
+- Fehlende oder abweichende Einträge in der nebeneinander angeordneten Diff-Ansicht prüfen.
+- Bei Konflikten einzeln entscheiden oder **„Alle von Quelle übernehmen“** verwenden.
+- Die Unterschiedsliste separat scrollen, den Entscheidungsfortschritt verfolgen und bei Bedarf **„Nur offene Konflikte“** anzeigen.
+- Den Import vor dem Speichern prüfen und bestätigen.
 
-Beim Import wird **nur der Browser-Tresor aktualisiert**. Sein bisheriges Master-Passwort bleibt erhalten; die importierte Datei wird nicht verändert.
+**Import in den Browser-Tresor:** Die ausgewählten Einträge werden im Browser-Tresor gespeichert. Dessen Master-Passwort bleibt erhalten; die importierte Quelldatei wird nicht verändert.
+
+**Import in einen geöffneten externen Tresor:** Nach dem Vergleich stehen zwei Speicheroptionen zur Wahl:
+
+1. **In neuer Datei speichern:** Die zusammengeführten Einträge als neue verschlüsselte `.enc`-Datei herunterladen. Der aktuell geöffnete Tresor bleibt unverändert.
+2. **In geöffneten Tresor übernehmen:** Die Einträge in der aktuellen Tresoransicht übernehmen und den aktualisierten Tresor als `.enc`-Datei herunterladen.
+
+Beide Optionen verwenden das **Master-Passwort des bereits geöffneten Tresors**. Das Master-Passwort der importierten Datei dient nur dazu, diese zu öffnen. **Weder die ursprüngliche externe Datei noch die importierte Quelldatei werden automatisch auf deinem Gerät überschrieben.** Prüfe den Download, bevor du eine ältere Datei ersetzt oder löschst.
 
 ### 💾 Sicherung und Schutz vor unbeabsichtigten Änderungen
 
 - Verschlüsselten Tresor als `.enc`-Datei exportieren.
 - Vor Änderungen am Browser-Tresor eine Sicherung zum Download anbieten.
+- Beim externen Datei-Import eine neue `.enc`-Datei herunterladen; vorhandene Dateien werden nicht automatisch überschrieben.
 - Optional **„Backup überspringen“** auswählen.
 - Beim Überspringen des Backups einen Warnhinweis und eine zusätzliche Bestätigung anzeigen.
 - Änderungen erst nach der abschließenden Bestätigung übernehmen.
@@ -137,15 +148,17 @@ Das Augen-Symbol im Eingabeformular steuert, ob das Passwort sichtbar ist. Ein n
 
 ### 4. Tresor importieren
 
-Öffne deinen Browser-Tresor und klicke neben **„+ Neues Passwort“** auf **„Tresor importieren“**.
+Öffne deinen **Browser-Tresor oder externen Datei-Tresor** und klicke neben **„+ Neues Passwort“** auf **„Tresor importieren“**. Wähle eine zweite `.enc`-Datei aus und entsperre sie mit ihrem Master-Passwort. Ein Browser-Tresor ist nicht erforderlich, wenn du bereits einen externen Tresor geöffnet hast.
 
-Wähle die externe `.enc`-Datei aus, entsperre sie und überprüfe die Unterschiede in der Diff-Ansicht. Bestätige anschließend die Einträge, die in den Browser-Tresor übernommen werden sollen.
+Vergleiche die Unterschiede in der Diff-Ansicht. Bei langen Listen kannst du innerhalb der Eintragsliste scrollen, während die Schaltflächen darunter erreichbar bleiben. Die Fortschrittsanzeige und der Filter **„Nur offene Konflikte“** helfen dir, noch ausstehende Entscheidungen zu finden.
+
+Beim **Browser-Tresor** bestätigst du die Einträge, die übernommen werden sollen. Beim **externen Tresor** wählst du anschließend zwischen **„In neuer Datei speichern“** und **„In geöffneten Tresor übernehmen“**. Lade die erzeugte `.enc`-Datei herunter und prüfe, ob sie sich mit dem Master-Passwort des zuvor geöffneten Tresors entsperren lässt.
 
 ### 5. Tresore synchronisieren
 
 Klicke auf **„Tresore synchronisieren“** und entsperre bei Bedarf den zweiten Tresor.
 
-Vergleiche die Einträge in der Diff-Ansicht und entscheide bei Konflikten, welche Version übernommen werden soll. Wähle danach aus, ob beide Tresore künftig dasselbe Master-Passwort oder weiterhin unterschiedliche Master-Passwörter verwenden sollen.
+Vergleiche die Einträge in der separat scrollbaren Diff-Ansicht, nutze bei Bedarf den Filter **„Nur offene Konflikte“** und entscheide bei Konflikten, welche Version übernommen werden soll. Wähle danach aus, ob beide Tresore künftig dasselbe Master-Passwort oder weiterhin unterschiedliche Master-Passwörter verwenden sollen.
 
 Prüfe die Zusammenfassung vor dem Abschluss. Lade die aktualisierte `.enc`-Datei herunter und bewahre sie am gewünschten Speicherort auf.
 
@@ -176,6 +189,7 @@ Für Funktionen wie den Zugriff auf die Zwischenablage kann eine sichere Browser
 ## ⚠️ Hinweise
 
 - Teste Import, Synchronisierung und Master-Passwort-Wechsel zunächst mit **Test-Tresoren**.
+- Prüfe bei einem externen Import beide Speicheroptionen mit Testdateien, bevor du eine bisherige Tresordatei ersetzt.
 - Prüfe nach dem Export, ob sich die heruntergeladene `.enc`-Datei mit dem erwarteten Master-Passwort wieder öffnen lässt.
 - Behalte vor größeren Änderungen nach Möglichkeit eine separate Sicherung.
 - Das Löschen des Browser-Tresors oder das Entfernen von Browserdaten kann lokal gespeicherte Einträge unzugänglich machen, wenn keine aktuelle externe Sicherung vorhanden ist.
