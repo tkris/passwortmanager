@@ -161,3 +161,9 @@ Use **“Einträge aus Tresor importieren” (Import entries from vault)** or **
 | `README.md` | This guide |
 
 [↑ Back to language selection](#-web-passwort-manager)
+
+### Smartphone: Kopiersymbole / Mobile: copy icons
+
+DE: Auf schmalen Bildschirmen (bis 680 px) stehen die Kopiersymbole für Benutzername und Passwort rechts unter dem Drei-Punkte-Menü, jeweils auf Höhe ihres Feldes. Das Augen-Symbol bleibt in der Passwortzeile. Die Desktop-Ansicht und die Kopierfunktionen bleiben unverändert.
+
+EN: On narrow screens (up to 680 px), the username and password copy icons align at the right below the three-dot menu, each alongside its respective field. The eye icon stays in the password row. Desktop layout and copy behavior remain unchanged.
