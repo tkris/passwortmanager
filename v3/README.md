@@ -178,3 +178,9 @@ EN: On narrow screens (up to 680 px), the username and password copy icons align
 DE: Aktionsbuttons in derselben Zeile (insbesondere „Neues Passwort“ und „Einträge aus Tresor importieren“) sind gleich hoch, auch wenn eine Beschriftung umbricht. Die bisherige Anordnung und die Funktionen bleiben unverändert.
 
 EN: Action buttons sharing a row (particularly “New password” and “Import entries from vault”) have equal heights even when a label wraps. Existing layout and functionality remain unchanged.
+
+### Kopiersymbole / Copy icons
+
+DE: Kopiersymbole stehen bei jeder Fensterbreite rechts in den Passwortkarten, jeweils auf Höhe des zugehörigen Feldes. Das Auge bleibt direkt beim Passwort.
+
+EN: Copy icons are aligned at the right edge of password cards at all viewport widths, level with their respective fields. The visibility icon stays next to the password.
