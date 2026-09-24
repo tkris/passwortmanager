@@ -181,3 +181,10 @@ EN: Vault selection, opening, locked and open vault views share the same respons
 **DE:** Die aufgeklappte Master-Passwortabfrage gehört optisch zum ausgewählten Zwischenstand: Zwischen dessen Aktionsbuttons und dem Passwortfeld erscheint keine zusätzliche Trennlinie. Die Trennlinie zum nächsten Zwischenstand bleibt erhalten.
 
 **EN:** The expanded master-password prompt is visually grouped with its selected draft: there is no additional divider between that draft’s action buttons and its password field. The divider separating the next draft remains.
+
+
+## Import-Hinweisfarbe / Import notification color
+
+**DE:** Nach dem Übernehmen von Einträgen erscheint der Hinweis „Einträge übernommen. Nicht gespeichert“ orange, im selben Orangeton wie der Status oben rechts. Die Import- und Speicherlogik sowie echte Fehlermeldungen bleiben unverändert.
+
+**EN:** After applying imported entries, the “Entries applied. Not saved” notification is orange, matching the save-status badge at the top right. Import and saving behavior and genuine error notifications are unchanged.
