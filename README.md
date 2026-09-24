@@ -115,3 +115,12 @@ Some browser features require a secure context such as HTTPS or `localhost`.
 ## 🤖 Development
 
 The source code and interface were created and extended with AI assistance. AI assistance does not replace code review or security certification.
+
+
+### Zwischenspeicher löschen und Notfallfreigabe
+
+Auf der Startseite verlangt **„Zwischenspeicher löschen“** das Master-Passwort des zwischengespeicherten Tresors und anschließend eine Bestätigung. Unten in der roten Hinweisbox befindet sich die separate **„Notfalloption: Zwischenspeicher ohne Passwort freigeben“**. Sie löscht den Zwischenstand erst nach einer ausdrücklichen Warnung vor unwiederbringlichem Datenverlust; ein noch nie als `.enc`-Datei exportierter Tresor kann dadurch vollständig verloren gehen. Die Notfallfreigabe gibt nur den einen Browser-Zwischenspeicher frei und öffnet oder importiert keine Passwörter. Bereits exportierte `.enc`-Dateien bleiben unverändert. Andere Personen mit Zugriff auf das Gerät können Browserdaten auch außerhalb dieser App löschen.
+
+### Delete cached draft and emergency release
+
+On the start screen, **“Zwischenspeicher löschen” (Delete cached draft)** requires the cached vault's master password followed by confirmation. The separate **“Notfalloption: Zwischenspeicher ohne Passwort freigeben” (Emergency release without password)** is at the bottom of the red warning box. It removes the cached draft only after an explicit warning about irreversible data loss; a vault that has never been exported to an `.enc` file may be lost entirely. Emergency release only frees the single browser cache: it does not unlock or import passwords. Previously exported `.enc` files remain unchanged. Anyone with access to the device can also clear browser data outside this app.

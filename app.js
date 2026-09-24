@@ -70,6 +70,8 @@ function updateStartScreen(){
     $('openVaultButton').textContent='📁 Tresor öffnen';
     $('resumeDraftButton').classList.toggle('hidden',localStorage.getItem(DRAFT)===null);
     $('deleteDraftButton').classList.toggle('hidden',!hasDraft);
+    $('draftWarningBox').classList.toggle('hidden',!hasDraft);
+    if(!hasDraft){$('deleteDraftForm').classList.add('hidden');$('deleteDraftPassword').value='';}
 }
 async function identityOf(raw){const bytes=new TextEncoder().encode(raw),digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');}
 function hasOwnDraft(){
@@ -210,17 +212,47 @@ $('closeWithoutSavingButton').addEventListener('click',async()=>{
     await lockVault('close-without-saving');
     message('Tresor ohne Speichern geschlossen. Bereits gespeicherte .enc-Dateien bleiben unverändert.');
 });
+function removeDraftAfterConfirmation(expectedRaw){
+    // Never delete a different draft if another tab changed the cache during confirmation.
+    if(localStorage.getItem(DRAFT)!==expectedRaw)throw Error('Der Zwischenstand hat sich geändert. Bitte erneut versuchen.');
+    localStorage.removeItem(DRAFT);
+    if(localStorage.getItem(DRAFT)!==null)throw Error('Zwischenspeicher konnte nicht gelöscht werden.');
+    pendingDraft=null;draftMode=false;fileRawData=null;creatingFromStart=false;
+    updateStartScreen();
+    message('Zwischenspeicher gelöscht. Du kannst wieder einen neuen Tresor erstellen. Gespeicherte .enc-Dateien bleiben unverändert.');
+}
 $('deleteDraftButton').addEventListener('click',()=>{
     if(busy||$('sourceSelect').classList.contains('hidden'))return;
     if(localStorage.getItem(DRAFT)===null){updateStartScreen();return;}
-    if(!confirm('Zwischengespeicherten Tresor wirklich löschen? Alle Änderungen, die du noch nicht als .enc-Datei gespeichert hast, gehen unwiderruflich verloren. Bereits gespeicherte .enc-Dateien bleiben unverändert.'))return;
+    $('deleteDraftForm').classList.remove('hidden');$('deleteDraftPassword').focus();
+});
+$('cancelDeleteDraftButton').addEventListener('click',()=>{
+    $('deleteDraftPassword').value='';$('deleteDraftForm').classList.add('hidden');
+});
+$('deleteDraftForm').addEventListener('submit',async e=>{
+    e.preventDefault();
+    if(busy||$('sourceSelect').classList.contains('hidden'))return;
+    const password=$('deleteDraftPassword').value;
+    if(!password){message('Bitte das Master-Passwort eingeben.');return;}
+    const expectedRaw=localStorage.getItem(DRAFT);
+    if(expectedRaw===null){updateStartScreen();return;}
+    busy=true;
     try{
-        localStorage.removeItem(DRAFT);
-        if(localStorage.getItem(DRAFT)!==null)throw Error('Zwischenspeicher konnte nicht gelöscht werden.');
-        pendingDraft=null;draftMode=false;fileRawData=null;creatingFromStart=false;
-        updateStartScreen();
-        message('Zwischenspeicher gelöscht. Du kannst wieder einen neuen Tresor erstellen. Gespeicherte .enc-Dateien bleiben unverändert.');
-    }catch(e){message('Löschen fehlgeschlagen: '+e.message);updateStartScreen();}
+        const draft=JSON.parse(expectedRaw);
+        if(!draft?.raw||!draft?.identity)throw Error('Zwischenstand beschädigt. Nutze gegebenenfalls die Notfalloption.');
+        await PasswordCrypto.open(JSON.parse(draft.raw),password);
+        if(!confirm('Zwischenspeicher wirklich löschen? Nicht als .enc-Datei gespeicherte Änderungen gehen unwiderruflich verloren.'))return;
+        removeDraftAfterConfirmation(expectedRaw);
+    }catch(err){message(err.message==='Zwischenstand beschädigt. Nutze gegebenenfalls die Notfalloption.'?err.message:'Löschen fehlgeschlagen: Master-Passwort prüfen oder Zwischenspeicher erneut laden.');}
+    finally{busy=false;$('deleteDraftPassword').value='';}
+});
+$('emergencyDraftButton').addEventListener('click',()=>{
+    if(busy||$('sourceSelect').classList.contains('hidden'))return;
+    const expectedRaw=localStorage.getItem(DRAFT);
+    if(expectedRaw===null){updateStartScreen();return;}
+    if(!confirm('NOTFALLOPTION: Zwischenspeicher ohne Master-Passwort endgültig freigeben?\n\nDer vorhandene Zwischenstand wird endgültig gelöscht. Falls der Tresor noch nie als .enc-Datei gespeichert wurde, können sämtliche darin enthaltenen Passwörter unwiederbringlich verloren gehen.\n\nTrotzdem ohne Passwort löschen?'))return;
+    try{removeDraftAfterConfirmation(expectedRaw);}
+    catch(err){message('Notfallfreigabe fehlgeschlagen: '+err.message);updateStartScreen();}
 });
 $('resumeDraftButton').addEventListener('click',()=>{try{pendingDraft=JSON.parse(localStorage.getItem(DRAFT));if(!pendingDraft?.raw||!pendingDraft?.identity)throw Error();fileRawData=pendingDraft.raw;source='file';draftMode=true;creatingFromStart=false;$('promptTitle').textContent='Zwischengespeicherte Arbeit fortsetzen';updateMasterPrompt();show('passwordPrompt');$('masterPassword').focus();}catch{message('Zwischenstand beschädigt oder nicht verfügbar.');}});
 $('importFile').addEventListener('change',()=>handleSourceSelection('file'));
