@@ -140,3 +140,17 @@ EN: Creating a vault and changing its master password no longer enforce a 12-cha
 **DE:** Allgemeine Statusmeldungen werden nicht mehr unter dem Logo angezeigt, sondern als kurzzeitige Benachrichtigungen unten rechts (auf schmalen Bildschirmen unten mittig). Erfolge erscheinen grün für etwa 3 Sekunden, Hinweise neutral für etwa 4 Sekunden und Fehler/Warnungen rot für etwa 7 Sekunden. Meldungen können über × sofort geschlossen werden. Der dauerhafte Speicherstatus im Tresor bleibt unverändert und ist unabhängig von diesen Benachrichtigungen.
 
 **EN:** General messages no longer occupy a line below the logo. They appear as temporary notifications at the bottom right (bottom center on narrow screens). Success messages are green for about 3 seconds, informational messages neutral for about 4 seconds, and errors/warnings red for about 7 seconds. The × button dismisses a message immediately. The persistent vault storage status remains unchanged and independent of notifications.
+
+
+## Einheitliche Ansichten und Passwortfelder / Unified views and password fields
+
+DE: Tresorauswahl, Tresor öffnen, gesperrter Tresor und geöffneter Tresor verwenden dieselbe responsive Fensterbreite. Die Master-Passwortfelder zum Öffnen, Anlegen und Entsperren besitzen nun ebenso wie die Passwortfelder im Eintragsformular und bei der Master-Passwortänderung ein Auge innerhalb des Felds. Beim Aufrufen sind Passwörter verborgen. Beim Generieren eines Eintragspassworts wird das neu erzeugte Passwort ausnahmsweise sofort angezeigt; über das Auge kann es wieder verborgen werden. Die Tresor- und Speicherlogik bleibt unverändert.
+
+EN: Vault selection, opening, locked and open vault views share the same responsive panel width. Master password inputs for opening, creating and unlocking a vault now have an in-field visibility toggle, like entry and master password change inputs. Passwords start hidden. Generating an entry password automatically reveals the new password; the eye control can hide it again. Vault and storage logic remain unchanged.
+
+
+## Kompakte Startseite / Compact home screen
+
+**DE:** Die Tresorauswahl ist wieder ein schmales, mittig ausgerichtetes Fenster im bestehenden 3.0-Design. Die Buttons „.enc-Datei öffnen“ und „Neuen Tresor anlegen“ stehen gleich breit untereinander. Die Notfall-Wiederherstellung erscheint nur, wenn im Browser strukturell verwendbare verschlüsselte Zwischenstände vorliegen; sie ist durch eine Linie von den Hauptaktionen getrennt. Ob ein Zwischenstand mit dem Master-Passwort entschlüsselt werden kann und zu einem geöffneten Tresor passt, wird weiterhin beim Öffnen geprüft. Ohne Zwischenstände wird auch keine Leerstandsmeldung angezeigt. Die Ansichten des geöffneten und gesperrten Tresors bleiben unverändert.
+
+**EN:** Vault selection is a narrow, centered panel using the existing 3.0 theme. The Open .enc and Create vault buttons are equally wide and stacked. Emergency recovery is separated from the main actions and shown only when structurally usable encrypted drafts exist in the browser. Decryption and vault matching are still checked when opening a draft or vault. No empty-state recovery message is shown. Open and locked vault views are unchanged.
