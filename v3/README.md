@@ -65,14 +65,14 @@ English: The browser test build now uses the compact dark 2.0-style layout with 
 
 - Die Tresorüberschrift zeigt die Eintragszahl; die orange Plakette „Nicht gespeichert“ erscheint nur bei ungespeicherten Änderungen. Der Speicherstatus ist einmalig und kompakt, die Export- und Speicherbuttons haben dieselbe Größe wie andere Aktionen.
 - „Einstellungen“ ist zunächst eingeklappt. Darin befinden sich „Symbole anzeigen“, die automatische Sperre und „Master-Passwort ändern“.
-- Der Master-Passwort-Wechsel ist **nur bei direktem, beschreibbarem Dateizugriff** möglich. Vorheriges Passwort wird geprüft, das neue muss mindestens 12 Zeichen lang und zweimal identisch sein. Die Datei wird erst nach Verschlüsselungsprüfung und ausdrücklicher Bestätigung überschrieben und danach erneut gelesen und geprüft. Ohne Dateihandle bleibt die Aktion deaktiviert; ein Download gilt nicht als bestätigter Passwortwechsel.
+- Der Master-Passwort-Wechsel ist **nur bei direktem, beschreibbarem Dateizugriff** möglich. Vorheriges Passwort wird geprüft, das neue darf nicht leer sein und muss zweimal identisch sein; bei weniger als 12 Zeichen erscheint ein bestätigbarer Sicherheitshinweis. Die Datei wird erst nach Verschlüsselungsprüfung und ausdrücklicher Bestätigung überschrieben und danach erneut gelesen und geprüft. Ohne Dateihandle bleibt die Aktion deaktiviert; ein Download gilt nicht als bestätigter Passwortwechsel.
 - **Vor einem Master-Passwort-Wechsel unbedingt eine externe Sicherungskopie anlegen.** Bei einem Fehler während des Schreibens ist der Dateistand möglicherweise unklar; in diesem Fall die Datei nicht blind erneut überschreiben. Der Passwortwechsel betrifft ausschließlich den aktuell geöffneten Tresor, nicht andere Tresore oder deren Notfall-Zwischenstände.
 
 ### Layout and master password (current test version)
 
 - The vault heading shows the entry count; the orange “Not saved” badge appears only for unsaved changes. Storage status is shown once in a compact panel with consistent action-button sizing.
 - Settings are collapsed by default and contain icon visibility, automatic locking and the master-password change action.
-- Changing the master password requires **direct writable file access**. The current password is checked, the new password must have at least 12 characters and match its confirmation. The replacement ciphertext is verified before the user confirms the write; the written file is read back and checked. The action is disabled without a writable file handle; an export alone cannot confirm a password change.
+- Changing the master password requires **direct writable file access**. The current password is checked, the new password must not be empty and must match its confirmation; passwords shorter than 12 characters trigger a confirmable security warning. The replacement ciphertext is verified before the user confirms the write; the written file is read back and checked. The action is disabled without a writable file handle; an export alone cannot confirm a password change.
 - **Create an external backup before changing the master password.** A write failure can leave the file in an uncertain state; do not overwrite it blindly. The change affects only the currently opened vault, not other vaults or their emergency drafts.
 
 
@@ -108,3 +108,28 @@ English: The browser test build now uses the compact dark 2.0-style layout with 
 DE: Das Augensymbol sitzt ohne sichtbaren Button-Hintergrund im Passwortfeld beim Erstellen und Bearbeiten. Unter Einstellungen öffnet „Master-Passwort ändern“ ein aufklappbares Formular mit drei Passwortfeldern und jeweils eigener Sichtbarkeitsfunktion; „Abbrechen“ verwirft die Eingaben. Ohne direkten Schreibzugriff wird das Formular angezeigt, aber die Änderung kann nicht abgeschlossen werden; es erscheint eine erklärende Meldung. Eine bestätigte Passwortänderung setzt weiterhin das Schreiben und Prüfen der .enc-Datei voraus.
 
 EN: The eye icon appears inside the password field without a separate visible button background in create/edit forms. Under Settings, “Change master password” expands a form with three password fields, each with its own visibility toggle; Cancel clears the inputs. Without direct file-write access, the form opens but the change cannot be completed and an explanation is displayed. A confirmed password change still requires writing and verifying the .enc file.
+
+
+### Sichtbarkeitssymbol korrigiert / Visibility icon fix
+
+**DE:** Das Auge im Passwortfeld für neue und bearbeitete Einträge wird nun als SVG mit sichtbarer Pupille dargestellt (statt als Kreis). Beim Einblenden wechselt es zum durchgestrichenen Auge; die Master-Passwortfelder behalten dieselbe Symbolfamilie. Die Änderung betrifft nur die Anzeige, nicht die Verschlüsselung oder das Tresorformat.
+
+**EN:** The eye in the create/edit password field is now rendered as an SVG with a visible pupil (rather than a circle). When the password is shown, the icon changes to an eye with a slash; master-password fields use the same icon family. This is a display-only change and does not alter encryption or the vault format.
+
+
+DE (Korrektur): Der Button „Master-Passwort ändern“ bleibt auch ohne direkten Dateizugriff anklickbar und öffnet das Formular. Erst das Abschließen erfordert einen beschreibbaren Dateihandle; andernfalls erscheint eine Erklärung.
+
+EN (fix): The “Change master password” button remains clickable without direct file access and opens the form. Completing the change requires a writable file handle; otherwise an explanation is shown.
+
+
+## Master-Passwort ändern ohne direkten Dateizugriff / Change master password without direct file access
+
+**DE:** Unter Einstellungen → Master-Passwort ändern das bisherige und zweimal das neue Master-Passwort eingeben. Bei direktem Dateizugriff wird die geöffnete Datei wie bisher geschrieben und geprüft. Ohne direkten Dateizugriff bietet die App stattdessen eine mit dem neuen Passwort verschlüsselte `.enc`-Datei zum Download an. Der Status bleibt orange „Nicht bestätigt“; die alte Datei wird nicht überschrieben. Die heruntergeladene Datei mit „.enc prüfen“ auswählen und das **neue** Master-Passwort eingeben. Die App vergleicht die exakten exportierten Dateibytes und den Tresorinhalt. Erst bei erfolgreicher Prüfung wechselt der Sitzungs-Schlüssel zum neuen Passwort, der Status wird grün „Gespeichert“ und der alte Notfall-Zwischenstand wird entfernt. Vorher gilt in der laufenden Sitzung weiterhin das bisherige Passwort. Die neue Datei beim nächsten Öffnen verwenden; die alte Datei erst nach erfolgreicher Prüfung selbst ersetzen oder sicher aufbewahren. Sperren, Änderungen am Tresor oder ein erneuter Master-Passwortwechsel vor der Prüfung verwerfen die ausstehende Umstellung; gegebenenfalls erneut exportieren. Falls der Download abgebrochen wurde oder die Prüfung scheitert, bleibt die alte Datei unverändert. Bitte zuerst ausschließlich mit Testtresoren ausprobieren.
+
+**EN:** In Settings → Change master password, enter the current password and the new password twice. With direct file access the app writes and verifies the opened file as before. Without direct access, it offers a newly encrypted `.enc` download; the old file is not overwritten and the status stays orange “Not confirmed”. Select the downloaded file via “Verify .enc” and enter the **new** master password. The app checks the exact exported file bytes and vault contents. Only successful verification switches the in-memory session key to the new password, shows green “Saved”, and removes the old emergency draft. Until then, the current session still uses the old password. Open the verified new file next time; only replace the old file yourself after verification. Locking, editing, or starting another password change before verification cancels the pending rotation; export again if needed. Test with disposable vaults first.
+
+### Master-Passwort-Länge / Master password length
+
+DE: Für neue Tresore und beim Ändern des Master-Passworts gilt keine feste Mindestlänge von 12 Zeichen mehr. Ein leeres Passwort ist weiterhin nicht zulässig, und die Wiederholung muss übereinstimmen. Beim Ändern erscheint für Passwörter unter 12 Zeichen ein bestätigbarer Sicherheitshinweis. Kürzere Master-Passwörter können leichter erraten werden.
+
+EN: Creating a vault and changing its master password no longer enforce a 12-character minimum. Empty passwords remain invalid and the confirmation must match. Changing to a password shorter than 12 characters displays a security warning that can be confirmed. Short master passwords may be easier to guess.
