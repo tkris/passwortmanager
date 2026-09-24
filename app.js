@@ -70,7 +70,6 @@ function updateStartScreen(){
     $('openVaultButton').textContent='📁 Tresor öffnen';
     $('resumeDraftButton').classList.toggle('hidden',localStorage.getItem(DRAFT)===null);
     $('deleteDraftButton').classList.toggle('hidden',!hasDraft);
-    $('draftWarningBox').classList.toggle('hidden',!hasDraft);
     $('emergencyDraftSection').classList.toggle('hidden',!hasDraft);
     if(!hasDraft){$('deleteDraftForm').classList.add('hidden');$('deleteDraftPassword').value='';}
 }
@@ -242,7 +241,7 @@ $('deleteDraftForm').addEventListener('submit',async e=>{
         const draft=JSON.parse(expectedRaw);
         if(!draft?.raw||!draft?.identity)throw Error('Zwischenstand beschädigt. Nutze gegebenenfalls die Notfalloption.');
         await PasswordCrypto.open(JSON.parse(draft.raw),password);
-        if(!confirm('Zwischenspeicher wirklich löschen? Nicht als .enc-Datei gespeicherte Änderungen gehen unwiderruflich verloren.'))return;
+        if(!confirm('Zwischenspeicher endgültig löschen?\n\nDer verschlüsselte Zwischenstand wird gelöscht. Falls der Tresor noch nicht als .enc-Datei gespeichert wurde, können alle darin enthaltenen Passwörter unwiederbringlich verloren gehen.'))return;
         removeDraftAfterConfirmation(expectedRaw);
     }catch(err){message(err.message==='Zwischenstand beschädigt. Nutze gegebenenfalls die Notfalloption.'?err.message:'Löschen fehlgeschlagen: Master-Passwort prüfen oder Zwischenspeicher erneut laden.');}
     finally{busy=false;$('deleteDraftPassword').value='';}

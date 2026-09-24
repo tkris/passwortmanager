@@ -124,3 +124,9 @@ Auf der Startseite verlangt **„Zwischenspeicher löschen“** das Master-Passw
 ### Delete cached draft and emergency release
 
 On the start screen, **“Zwischenspeicher löschen” (Delete cached draft)** requires the cached vault's master password followed by confirmation. The separate **“Notfalloption: Zwischenspeicher ohne Passwort freigeben” (Emergency release without password)** appears in the lower **“Sicherheitshinweise” (Security information)** panel under **“Mehr zur Sicherheit” (More about security)** only when a cached draft exists. It removes the cached draft only after an explicit warning about irreversible data loss; a vault that has never been exported to an `.enc` file may be lost entirely. Emergency release only frees the single browser cache: it does not unlock or import passwords. Previously exported `.enc` files remain unchanged. Anyone with access to the device can also clear browser data outside this app.
+
+### Hinweis zur Startseite / Start screen notice
+
+Die große rote Meldung zum vorhandenen Zwischenstand entfällt. Beim regulären Löschen wird zuerst das Master-Passwort geprüft; erst nach erfolgreicher Prüfung folgt eine ausdrückliche Bestätigung mit Warnung vor dem möglichen endgültigen Verlust eines noch nicht exportierten Tresors. Die Notfalloption bleibt ausschließlich im aufklappbaren Bereich „Sicherheitshinweise“ sichtbar, solange ein Zwischenstand existiert.
+
+The large red cached-draft notice has been removed from the start screen. Regular deletion verifies the cached vault’s master password first, then requests explicit confirmation with a warning that a vault not yet exported may be lost permanently. The emergency option remains available only in the expandable security information section while a cached draft exists.
