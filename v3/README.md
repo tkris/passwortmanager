@@ -167,3 +167,8 @@ Use **“Einträge aus Tresor importieren” (Import entries from vault)** or **
 DE: Auf schmalen Bildschirmen (bis 680 px) stehen die Kopiersymbole für Benutzername und Passwort rechts unter dem Drei-Punkte-Menü, jeweils auf Höhe ihres Feldes. Das Augen-Symbol bleibt in der Passwortzeile. Die Desktop-Ansicht und die Kopierfunktionen bleiben unverändert.
 
 EN: On narrow screens (up to 680 px), the username and password copy icons align at the right below the three-dot menu, each alongside its respective field. The eye icon stays in the password row. Desktop layout and copy behavior remain unchanged.
+
+### Smartphone: Passwort-Auge / Mobile: password visibility icon
+
+- DE: Auf schmalen Bildschirmen steht das Auge direkt rechts neben dem Passwort. Das Kopiersymbol bleibt rechts am Kartenrand unter dem Drei-Punkte-Menü. Die Desktop-Anordnung und die Funktionen bleiben unverändert.
+- EN: On narrow screens, the visibility icon sits immediately to the right of the password. The copy icon stays at the right edge beneath the three-dot menu. Desktop layout and functionality are unchanged.
