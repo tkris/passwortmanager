@@ -51,6 +51,14 @@ function usableDraft(d){
  if(!d||typeof d.id!=='string'||d.id.length<=15||typeof d.raw!=='string'||!d.raw||!Number.isFinite(d.created))return false;
  try{const encrypted=JSON.parse(d.raw);return encrypted&&typeof encrypted==='object'&&!Array.isArray(encrypted);}catch{return false;}
 }
+function closeDraftUnlock(){
+ document.querySelectorAll('#drafts .draft-unlock').forEach(form=>{
+  form.classList.add('hidden');const input=form.querySelector('input');if(input){input.value='';input.type='password';}
+  const eye=form.querySelector('.master-eye');if(eye){eye.setAttribute('aria-pressed','false');eye.setAttribute('aria-label','Passwort anzeigen');eye.title='Passwort anzeigen';eye.querySelector('svg').innerHTML=icons.eye;}
+ });
+ document.querySelectorAll('#drafts .draft-resume').forEach(button=>button.setAttribute('aria-expanded','false'));
+ if(mode==='draft'){pending=null;mode='';}
+}
 async function listDrafts(){
  const root=$('drafts'),panel=$('homeRecovery');root.replaceChildren();panel.classList.add('hidden');
  try{
@@ -60,30 +68,45 @@ async function listDrafts(){
    const row=document.createElement('div');row.className='draft-row';
    const title=document.createElement('span');title.textContent='Zwischenstand '+d.id.slice(0,8)+' · '+new Date(d.created).toLocaleString();
    const resume=document.createElement('button');resume.textContent='Wiederherstellen';
-   resume.onclick=()=>{closeCreate();pending={kind:'draft',draft:d};mode='draft';$('unlockTitle').textContent='Notfall-Zwischenstand entsperren';$('repeatRow').classList.add('hidden');view('unlock');};
+   resume.className='draft-resume';resume.type='button';resume.setAttribute('aria-expanded','false');
+   const form=document.createElement('div');form.className='draft-unlock hidden';form.id='draftUnlock-'+d.id.replace(/[^a-zA-Z0-9_-]/g,'');resume.setAttribute('aria-controls',form.id);
+   const label=document.createElement('label');label.textContent='Master-Passwort für diesen Zwischenstand';
+   const wrap=document.createElement('div');wrap.className='master-password-wrap';
+   const input=document.createElement('input');input.type='password';input.autocomplete='off';input.id='draftMaster-'+d.id.replace(/[^a-zA-Z0-9_-]/g,'');label.htmlFor=input.id;
+   const eye=document.createElement('button');eye.type='button';eye.className='master-eye';eye.setAttribute('aria-label','Passwort anzeigen');eye.setAttribute('aria-pressed','false');eye.title='Passwort anzeigen';eye.innerHTML='<svg viewBox="0 0 24 24" aria-hidden="true">'+icons.eye+'</svg>';
+   eye.onclick=()=>{const visible=input.type==='password';input.type=visible?'text':'password';eye.setAttribute('aria-pressed',String(visible));eye.setAttribute('aria-label',visible?'Passwort verbergen':'Passwort anzeigen');eye.title=visible?'Passwort verbergen':'Passwort anzeigen';eye.querySelector('svg').innerHTML=icons[visible?'eyeOff':'eye'];};
+   wrap.append(input,eye);
+   const actions=document.createElement('div');actions.className='action-row';
+   const go=document.createElement('button');go.type='button';go.textContent='Wiederherstellen';
+   go.onclick=()=>{pending={kind:'draft',draft:d};mode='draft';$('unlockGo').click();};
+   const cancel=document.createElement('button');cancel.type='button';cancel.className='secondary';cancel.textContent='Abbrechen';cancel.onclick=closeDraftUnlock;
+   input.addEventListener('keydown',e=>{if(e.key==='Enter')go.click();});
+   actions.append(go,cancel);form.append(label,wrap,actions);
+   resume.onclick=()=>{const opening=form.classList.contains('hidden');closeDraftUnlock();if(!opening)return;closeCreate();pending={kind:'draft',draft:d};mode='draft';form.classList.remove('hidden');resume.setAttribute('aria-expanded','true');input.focus();};
    const del=document.createElement('button');del.className='secondary';del.textContent='Zwischenstand entfernen';
    del.onclick=async()=>{if(!confirm('Dieser verschlüsselte Zwischenstand wird endgültig gelöscht. Nicht in einer .enc-Datei gespeicherte Passwörter können unwiederbringlich verloren gehen. Fortfahren?'))return;await delDraft(d.id);await listDrafts();};
-   row.append(title,resume,del);root.append(row);
+   const rowActions=document.createElement('div');rowActions.className='draft-row-actions';rowActions.append(resume,del);
+   row.append(title,rowActions,form);root.append(row);
   }
   panel.classList.remove('hidden');
  }catch(e){note('Notfall-Zwischenstände konnten nicht geladen werden: '+e.message,'error');}
 }
 function closeCreate(){ $('homeCreate').classList.add('hidden');$('new').setAttribute('aria-expanded','false');for(const id of ['createMaster','createRepeat']){$(id).value='';$(id).type='password';}document.querySelectorAll('#homeCreate .master-eye').forEach(b=>{b.setAttribute('aria-pressed','false');b.setAttribute('aria-label','Passwort anzeigen');b.title='Passwort anzeigen';b.querySelector('svg').innerHTML=icons.eye;});}
-function reset(){pendingMaster=null;lockedSession=null;compareClose();s=null;pending=null;mode='';$('master').value='';$('repeat').value='';closeCreate();clearEdit();view('home');listDrafts();}
+function reset(){closeDraftUnlock();pendingMaster=null;lockedSession=null;compareClose();s=null;pending=null;mode='';$('master').value='';$('repeat').value='';closeCreate();clearEdit();view('home');listDrafts();}
 $('new').setAttribute('aria-controls','homeCreate');$('new').setAttribute('aria-expanded','false');
-$('new').onclick=()=>{const panel=$('homeCreate'),opening=panel.classList.contains('hidden');if(!opening){closeCreate();pending=null;mode='';return;}pending={kind:'new'};mode='new';panel.classList.remove('hidden');$('new').setAttribute('aria-expanded','true');$('createMaster').focus();};
+$('new').onclick=()=>{const panel=$('homeCreate'),opening=panel.classList.contains('hidden');if(!opening){closeCreate();pending=null;mode='';return;}closeDraftUnlock();pending={kind:'new'};mode='new';panel.classList.remove('hidden');$('new').setAttribute('aria-expanded','true');$('createMaster').focus();};
 $('createCancel').onclick=()=>{closeCreate();pending=null;mode='';};
 $('createGo').onclick=()=>{$('unlockGo').click();};
 for(const id of ['createMaster','createRepeat'])$(id).addEventListener('keydown',e=>{if(e.key==='Enter'){$('createGo').click();}});
 $('open').onclick=async()=>{closeCreate();if('showOpenFilePicker'in window){try{const [handle]=await showOpenFilePicker({types:[{description:'Verschlüsselter Tresor',accept:{'application/octet-stream':['.enc']}}]});const raw=await (await handle.getFile()).text();pending={kind:'file',raw,handle};mode='file';$('unlockTitle').textContent='Tresor öffnen';$('repeatRow').classList.add('hidden');view('unlock');return;}catch(e){if(e.name==='AbortError')return;note('Direkter Dateizugriff nicht verfügbar: '+e.message);}}$('file').click();};
 $('file').onchange=async()=>{closeCreate();const f=$('file').files[0];if(!f)return;pending={kind:'file',raw:await f.text(),handle:null};mode='file';$('unlockTitle').textContent='Tresor öffnen';$('repeatRow').classList.add('hidden');view('unlock');$('file').value='';};
 $('unlockCancel').onclick=reset;
-$('unlockGo').onclick=async()=>{if(busy)return;busy=true;try{const pass=$(mode==='new'?'createMaster':'master').value;if(!pass)throw Error('Master-Passwort fehlt.');let opened,entries,id,baseRaw=null,baseHash=null,handle=null,dirty=false,recovery=false,confirmedSave=false;const openingMode=mode;if(openingMode==='new'){if(pass!==$('createRepeat').value)throw Error('Master-Passwort und Wiederholung müssen übereinstimmen.');opened=await PasswordCrypto.create(pass);entries=[];id=uuid();dirty=true;}else if(openingMode==='file'){opened=await PasswordCrypto.open(JSON.parse(pending.raw),pass);const p=parsePayload(opened.plaintext);entries=p.entries;id=p.id||uuid();baseRaw=pending.raw;baseHash=await hash(baseRaw);handle=pending.handle;
+$('unlockGo').onclick=async()=>{if(busy)return;busy=true;try{const draftInput=mode==='draft'?document.querySelector('#drafts .draft-unlock:not(.hidden) input'):null;const pass=mode==='new'?$('createMaster').value:mode==='draft'?(draftInput?draftInput.value:''):$('master').value;if(!pass)throw Error('Master-Passwort fehlt.');let opened,entries,id,baseRaw=null,baseHash=null,handle=null,dirty=false,recovery=false,confirmedSave=false;const openingMode=mode;if(openingMode==='new'){if(pass!==$('createRepeat').value)throw Error('Master-Passwort und Wiederholung müssen übereinstimmen.');opened=await PasswordCrypto.create(pass);entries=[];id=uuid();dirty=true;}else if(openingMode==='file'){opened=await PasswordCrypto.open(JSON.parse(pending.raw),pass);const p=parsePayload(opened.plaintext);entries=p.entries;id=p.id||uuid();baseRaw=pending.raw;baseHash=await hash(baseRaw);handle=pending.handle;
 // Never create a recovery draft merely because an older 2.0 file lacks a vault ID.
 // Inspect an existing draft before modifying any session or recovery state.
 if(p.id){const d=await getDraft(id);if(d){if(d.baseHash!==baseHash){note('Ein Notfall-Zwischenstand stammt von einem anderen Dateistand. Er wurde NICHT automatisch übernommen.');}else{let candidate=null;try{const r=await PasswordCrypto.open(JSON.parse(d.raw),pass);const dp=parsePayload(r.plaintext);if(dp.id===id&&JSON.stringify(dp.entries)!==JSON.stringify(entries))candidate=dp.entries;}catch(e){note('Notfall-Zwischenstand konnte nicht geprüft werden: '+e.message);}if(candidate&&confirm('Für diesen Tresor gibt es ungespeicherte Änderungen. Statt des Dateistands den Notfall-Zwischenstand wiederherstellen?')){entries=candidate;dirty=true;recovery=true;}}}}
 }else if(openingMode==='draft'){opened=await PasswordCrypto.open(JSON.parse(pending.draft.raw),pass);const p=parsePayload(opened.plaintext);if(p.id!==pending.draft.id)throw Error('Tresor-ID stimmt nicht überein.');entries=p.entries;id=p.id;baseRaw=pending.draft.baseRaw;baseHash=pending.draft.baseHash;dirty=true;recovery=true;}else throw Error('Kein Tresor ausgewählt.');
-s={id,entries,key:opened.key,salt:opened.salt,baseRaw,baseHash,handle,dirty,recovery,confirmedSave,exportPending:false};$('repeat').value='';$('search').value='';if(openingMode==='new')closeCreate();view('vault');lastActivity=Date.now();render();if(openingMode==='new'){try{await draftNow();}catch(e){note('Notfall-Wiederherstellung nicht verfügbar: '+e.message);}}$('master').value='';if(openingMode==='new')note('Neuer Tresor: zuerst als .enc-Datei exportieren oder direkt speichern. Noch keine Datei vorhanden.');else if(openingMode==='draft')note('Notfall-Zwischenstand wiederhergestellt. Änderungen sind NICHT in der .enc-Datei gespeichert.');}catch(e){note('Öffnen fehlgeschlagen: '+e.message);}finally{busy=false;}};
+s={id,entries,key:opened.key,salt:opened.salt,baseRaw,baseHash,handle,dirty,recovery,confirmedSave,exportPending:false};$('repeat').value='';$('search').value='';if(openingMode==='new')closeCreate();if(openingMode==='draft')closeDraftUnlock();view('vault');lastActivity=Date.now();render();if(openingMode==='new'){try{await draftNow();}catch(e){note('Notfall-Wiederherstellung nicht verfügbar: '+e.message);}}$('master').value='';if(openingMode==='new')note('Neuer Tresor: zuerst als .enc-Datei exportieren oder direkt speichern. Noch keine Datei vorhanden.');else if(openingMode==='draft')note('Notfall-Zwischenstand wiederhergestellt. Änderungen sind NICHT in der .enc-Datei gespeichert.');}catch(e){note('Öffnen fehlgeschlagen: '+e.message);}finally{busy=false;}};
 // Cryptographically secure password generator; unbiased character selection and Fisher–Yates shuffle.
 function secureIndex(limit){const range=0x100000000,cutoff=range-(range%limit),word=new Uint32Array(1);let n;do{crypto.getRandomValues(word);n=word[0];}while(n>=cutoff);return n%limit;}
 function setFormPasswordVisible(show){$('password').type=show?'text':'password';$('toggleFormPassword').innerHTML=svg(show?'eyeOff':'eye');$('toggleFormPassword').setAttribute('aria-pressed',String(show));$('toggleFormPassword').setAttribute('aria-label',show?'Passwort verbergen':'Passwort anzeigen');$('toggleFormPassword').title=show?'Passwort verbergen':'Passwort anzeigen';}

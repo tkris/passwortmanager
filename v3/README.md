@@ -161,3 +161,17 @@ EN: Vault selection, opening, locked and open vault views share the same respons
 **DE:** „Neuen Tresor anlegen“ öffnet die beiden Master-Passwortfelder direkt unter den Hauptbuttons auf der kompakten Startseite, abgetrennt durch dieselbe Linie wie die Notfall-Wiederherstellung. Erneutes Klicken oder „Abbrechen“ klappt das Formular zu und leert die Eingaben. Wenn Notfall-Zwischenstände vorhanden sind, bleiben sie darunter in einem eigenen, ebenfalls abgetrennten Bereich sichtbar. Beim Erstellen wird weiterhin eine neue Tresor-ID vergeben; bestehende Zwischenstände anderer Tresore werden nicht gelöscht. Öffnen einer .enc-Datei und Wiederherstellen verwenden weiterhin die eigene Entsperransicht.
 
 **EN:** “Create vault” expands the two master-password fields below the main buttons on the compact home screen, using the same divider as emergency recovery. Clicking it again or choosing Cancel collapses the form and clears its inputs. When recovery drafts exist, they remain visible below in their own separately divided area. Creating a vault still assigns a new vault ID and does not delete other vaults’ drafts. Opening an .enc file and restoring a draft retain their separate unlock screen.
+
+
+## Notfall-Passwort direkt auf der Startseite / Inline recovery password
+
+**DE:** „Wiederherstellen“ klappt die Master-Passwortabfrage direkt unter dem ausgewählten Notfall-Zwischenstand auf, mit Passwort-Auge, „Wiederherstellen“ und „Abbrechen“. Es wird keine separate Entsperransicht für diese Aktion geöffnet. Das Öffnen eines anderen Zwischenstands oder des Formulars „Neuen Tresor anlegen“ schließt die vorherige Abfrage und leert deren Passwortfeld. Ein Abbruch löscht keinen Zwischenstand. Entschlüsselung, Tresor-ID-Prüfung und Speicherstatus bleiben unverändert. Die Entsperransicht für das Öffnen einer `.enc`-Datei bleibt bestehen.
+
+**EN:** “Restore” expands the master-password prompt immediately beneath the selected emergency draft, with a password visibility toggle and Restore/Cancel actions. Recovery no longer navigates to a separate unlock screen. Opening another draft or the Create vault form closes the previous prompt and clears its password. Cancelling does not delete any draft. Decryption, vault ID verification, and save-status rules are unchanged. Opening an `.enc` file still uses its existing unlock screen.
+
+
+## Mehrere Zwischenstände / Multiple recovery drafts
+
+**DE:** Jeder Zwischenstand hat eine eigene, unmittelbar unter seinen Aktionsbuttons angeordnete aufklappbare Passwortabfrage. Beim Wechsel zu einem anderen Zwischenstand oder zum Formular „Neuen Tresor anlegen“ wird die bisherige Abfrage geschlossen und ihr Passwort geleert. Nur eine Abfrage ist gleichzeitig geöffnet; „Abbrechen“ entfernt keinen Zwischenstand. Die Zwischenstände bleiben voneinander getrennt.
+
+**EN:** Each recovery draft has its own expandable password prompt immediately below its action buttons. Selecting a different draft or the Create vault form closes the previous prompt and clears its password. Only one prompt is open at a time; Cancel never deletes a draft. Drafts remain independent.
