@@ -130,3 +130,9 @@ On the start screen, **“Zwischenspeicher löschen” (Delete cached draft)** r
 Die große rote Meldung zum vorhandenen Zwischenstand entfällt. Beim regulären Löschen wird zuerst das Master-Passwort geprüft; erst nach erfolgreicher Prüfung folgt eine ausdrückliche Bestätigung mit Warnung vor dem möglichen endgültigen Verlust eines noch nicht exportierten Tresors. Die Notfalloption bleibt ausschließlich im aufklappbaren Bereich „Sicherheitshinweise“ sichtbar, solange ein Zwischenstand existiert.
 
 The large red cached-draft notice has been removed from the start screen. Regular deletion verifies the cached vault’s master password first, then requests explicit confirmation with a warning that a vault not yet exported may be lost permanently. The emergency option remains available only in the expandable security information section while a cached draft exists.
+
+### Kompakte Eintragsaktionen / Compact entry actions
+
+**Deutsch:** Die kompakten Eintragskarten behalten ihre optionalen, lokal erzeugten Website-Symbole. Ein Kopiersymbol neben dem Benutzernamen kopiert nur den Benutzernamen; neben dem standardmäßig verdeckten Passwort stehen ein Auge zum Ein-/Ausblenden und ein eigenes Kopiersymbol. Bearbeiten und Löschen befinden sich im Drei-Punkte-Menü des jeweiligen Eintrags. Löschen verlangt weiterhin eine Bestätigung. Die Zwischenablage wird nach etwa 30 Sekunden nach Möglichkeit nur dann geleert, wenn sie noch den kopierten Wert enthält.
+
+**English:** Compact entry cards retain the optional, locally generated website symbols. The copy icon beside the username copies only the username; the password remains hidden by default and has its own reveal/hide eye and copy icon. Edit and Delete are available from each entry’s three-dot menu. Deletion still requires confirmation. Where permitted, the clipboard is cleared after about 30 seconds only if it still contains the copied value.

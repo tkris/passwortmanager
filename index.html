@@ -15,13 +15,23 @@
 #vaultView .password-card{display:flex;align-items:center;gap:14px;background:#192231;border-color:#35465d;border-radius:11px;padding:16px;margin:10px 0}
 .entry-main{min-width:0;flex:1 1 230px}.entry-main h3{color:#eef2ff;margin:0 0 7px}.entry-main p{margin:5px 0;color:#cbd5e1;font-size:.9rem}
 .site-mark{flex:0 0 48px;width:48px;height:48px;display:grid;place-items:center;background:#29364a;border-radius:12px;color:#c7d2fe;font-size:1.35rem;font-weight:700}
-#vaultView .password-card .actions{justify-content:flex-end;flex:0 1 auto;gap:7px}
-#vaultView .password-card .actions button{display:inline-flex;align-items:center;justify-content:center;gap:7px;margin:0;padding:9px 11px;background:#263348;border:1px solid #465872;border-radius:8px;color:#dce5f7;font-size:.82rem;font-weight:500}
-#vaultView .password-card .actions button.btn-danger{background:#332431;border-color:#87414d;color:#ff9ca7}
+#vaultView .entry-header{display:flex;align-items:center;justify-content:space-between;gap:8px}
+#vaultView .entry-header h3{min-width:0;margin:0 0 5px}
+#vaultView .entry-detail-row{display:flex;align-items:center;gap:4px;min-height:29px;color:#cbd5e1;font-size:.9rem}
+#vaultView .entry-detail-text{min-width:0;overflow-wrap:anywhere;flex:0 1 auto}
+#vaultView .entry-icon-button,#vaultView .entry-menu summary{display:inline-flex;align-items:center;justify-content:center;flex:none;width:30px;height:30px;padding:5px;margin:0;background:transparent;color:#cbd5e1;border:1px solid transparent;border-radius:7px;cursor:pointer}
+#vaultView .entry-icon-button:hover,#vaultView .entry-menu summary:hover{background:#334155;border-color:#465872}
+#vaultView .entry-icon-button:focus-visible,#vaultView .entry-menu summary:focus-visible{outline:2px solid #a5b4fc;outline-offset:2px}
+#vaultView .entry-menu{position:relative;flex:none}
+#vaultView .entry-menu summary{list-style:none}
+#vaultView .entry-menu summary::-webkit-details-marker{display:none}
+#vaultView .entry-menu-content{position:absolute;right:0;top:32px;z-index:5;display:flex;flex-direction:column;gap:4px;min-width:140px;padding:6px;background:#27354a;border:1px solid #52637c;border-radius:8px;box-shadow:0 8px 22px #0007}
+#vaultView .entry-menu-content button{display:flex;align-items:center;gap:8px;text-align:left;margin:0;padding:8px 10px;background:#334155;color:#e2e8f0;font-size:.86rem;font-weight:500}
+#vaultView .entry-menu-content button.btn-danger{background:#432934;color:#ffb4be}
 .action-icon{width:16px;height:16px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 #newEntry{margin:0}.entry-buttons{display:flex;justify-content:center;align-items:center;gap:10px;flex-wrap:wrap;margin:22px auto 12px}
-@media(max-width:740px){#vaultView .password-card{flex-wrap:wrap}.entry-main{flex:1 1 calc(100% - 70px)}#vaultView .password-card .actions{flex:1 1 100%;justify-content:flex-start}}
-@media(max-width:480px){#vaultView{padding:14px}#vaultView .toolbar{grid-template-columns:1fr}}
+@media(max-width:740px){#vaultView .password-card{gap:10px}.entry-main{flex:1 1 auto}}
+@media(max-width:480px){#vaultView{padding:14px}#vaultView .toolbar{grid-template-columns:1fr}#vaultView .password-card{padding:10px;gap:9px}.site-mark{flex-basis:36px;width:36px;height:36px;font-size:1rem}.entry-main{min-width:0}#vaultView .entry-detail-row{font-size:.82rem}}
 
 /* Kompakter Passwortgenerator: Regler und vier Optionen in einer Reihe */
 #entryForm .generator-options{display:flex;align-items:center;justify-content:space-between;flex-wrap:nowrap;gap:6px;margin:10px 0 12px;width:100%}

@@ -147,16 +147,64 @@ async function deleteEntry(i){if(!active()||busy||!confirm('Diesen Eintrag wirkl
 function strength(p){if(!p)return 'Noch kein Passwort';let score=0;if(p.length>=12)score++;if(p.length>=16)score++;if(p.length>=24)score++;if(/[a-z]/.test(p)&&/[A-Z]/.test(p))score++;if(/\d/.test(p)&&/[^\w]/.test(p))score++;if(/(.)\1{3,}/.test(p)||/^(password|passwort|123456|qwerty)/i.test(p))score=Math.min(score,1);return ['Sehr schwach','Schwach','Mittel','Gut','Stark','Sehr stark'][score]+' (grobe Schätzung)';}
 function updateStrength(){$('strength').textContent='Passwortstärke: '+strength($('password').value);}
 function generateRandomPassword(){const sets=Object.entries(groups).filter(([k])=>$(k).checked).map(([,v])=>v);const length=Number($('passwordLength').value);if(!sets.length||length<sets.length){message('Mindestens eine Zeichengruppe auswählen.');return;}const all=sets.join(''),chars=sets.map(s=>s[randomIndex(s.length)]);while(chars.length<length)chars.push(all[randomIndex(all.length)]);for(let i=chars.length-1;i>0;i--){const j=randomIndex(i+1);[chars[i],chars[j]]=[chars[j],chars[i]];}$('password').value=chars.join('');setEditorPasswordVisible(true);updateStrength();}
-async function copyPassword(i){if(!active())return;const password=decryptedVault[i]?.password;if(!password)return;try{await navigator.clipboard.writeText(password);message('Passwort kopiert. Zwischenablage nach 30 Sekunden, sofern möglich, bereinigen.');if(clipboardTimer)clearTimeout(clipboardTimer);clipboardTimer=setTimeout(async()=>{try{if(await navigator.clipboard.readText()===password)await navigator.clipboard.writeText('');}catch{}},30000);}catch{message('Kopieren nicht erlaubt. Bitte HTTPS oder localhost verwenden.');}}
+async function copyEntryField(i,field){
+ if(!active())return;
+ const value=decryptedVault[i]?.[field];
+ if(typeof value!=='string')return;
+ try{
+  await navigator.clipboard.writeText(value);
+  message(field==='username'?'Benutzername kopiert.':'Passwort kopiert. Zwischenablage nach 30 Sekunden, sofern möglich, bereinigen.');
+  if(clipboardTimer)clearTimeout(clipboardTimer);
+  clipboardTimer=setTimeout(async()=>{try{if(await navigator.clipboard.readText()===value)await navigator.clipboard.writeText('');}catch{}},30000);
+ }catch{message('Kopieren nicht erlaubt. Bitte HTTPS oder localhost verwenden.');}
+}
+async function copyPassword(i){return copyEntryField(i,'password');}
 // Icons bestehen nur aus lokal erzeugten SVG-Elementen: keine externen Logo-Anfragen.
-const iconPaths={eye:['M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7','M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6'],copy:['M8 4h11a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2','M4 17H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v1'],edit:['M12 20h9','M16.5 3.5a2.12 2.12 0 0 1 3 3L9 17l-4 1 1-4Z'],trash:['M3 6h18','M8 6V4h8v2','M6 6l1 15h10l1-15','M10 10v7','M14 10v7'],hide:['M3 3l18 18','M10.6 10.6a2 2 0 0 0 2.8 2.8','M9.9 5.2A10.5 10.5 0 0 1 12 5c6.4 0 10 7 10 7a16 16 0 0 1-3.1 3.9','M6.2 6.2C3.5 8.1 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4-.8']};
+const iconPaths={eye:['M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7','M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6'],copy:['M8 4h11a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2','M4 17H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1h13a1 1 0 0 1 1 1v1'],edit:['M12 20h9','M16.5 3.5a2.12 2.12 0 0 1 3 3L9 17l-4 1 1-4Z'],trash:['M3 6h18','M8 6V4h8v2','M6 6l1 15h10l1-15','M10 10v7','M14 10v7'],more:['M5 12h.01','M12 12h.01','M19 12h.01'],hide:['M3 3l18 18','M10.6 10.6a2 2 0 0 0 2.8 2.8','M9.9 5.2A10.5 10.5 0 0 1 12 5c6.4 0 10 7 10 7a16 16 0 0 1-3.1 3.9','M6.2 6.2C3.5 8.1 2 12 2 12s3.6 7 10 7a10 10 0 0 0 4-.8']};
 let showIcons=localStorage.getItem('vault_show_icons')!=='false';
 $('showIcons').checked=showIcons;
 $('showIcons').addEventListener('change',()=>{showIcons=$('showIcons').checked;localStorage.setItem('vault_show_icons',String(showIcons));renderPasswords();});
 function makeIcon(name){const ns='http://www.w3.org/2000/svg',svg=document.createElementNS(ns,'svg');svg.setAttribute('viewBox','0 0 24 24');svg.setAttribute('aria-hidden','true');svg.classList.add('action-icon');for(const d of iconPaths[name]||[]){const path=document.createElementNS(ns,'path');path.setAttribute('d',d);svg.append(path);}return svg;}
 function makeButton(text,fn,cls='btn-secondary',iconName=''){const b=document.createElement('button');b.type='button';b.className=cls;if(showIcons&&iconName)b.append(makeIcon(iconName));b.append(document.createTextNode(text));b.addEventListener('click',fn);return b;}
 function siteInitial(url){let name=url.trim();try{name=new URL(/^https?:\/\//i.test(name)?name:'https://'+name).hostname.replace(/^www\./i,'');}catch{}return (name.replace(/[^\p{L}\p{N}]/gu,'').charAt(0)||'?').toLocaleUpperCase('de');}
-function renderPasswords(){const c=$('passwordsContainer');c.replaceChildren();if(!active())return;const q=$('search').value.toLocaleLowerCase('de'),sort=$('sort').value;const found=decryptedVault.map((e,i)=>({e,i})).filter(({e})=>(e.url+' '+e.username).toLocaleLowerCase('de').includes(q));found.sort((a,b)=>{if(sort==='newest')return (b.e.updatedAt||'').localeCompare(a.e.updatedAt||'');if(sort==='oldest')return (a.e.updatedAt||'').localeCompare(b.e.updatedAt||'');return String(a.e[sort]||'').localeCompare(String(b.e[sort]||''),'de');});if(!found.length){const p=document.createElement('p');p.textContent='Keine passenden Einträge.';c.append(p);return;}for(const {e,i} of found){const card=document.createElement('article');card.className='password-card';const main=document.createElement('div');main.className='entry-main';const h=document.createElement('h3');h.textContent=e.url;const u=document.createElement('p');u.textContent='Benutzername: '+e.username;const p=document.createElement('p'),v=document.createElement('span');v.textContent=revealed.has(i)?e.password:'••••••••';p.append('Passwort: ',v);main.append(h,u,p);const actions=document.createElement('div');actions.className='actions';actions.append(makeButton(revealed.has(i)?'Verbergen':'Anzeigen',()=>{if(revealed.has(i))revealed.delete(i);else revealed.add(i);renderPasswords();},'btn-secondary',revealed.has(i)?'hide':'eye'),makeButton('Kopieren',()=>copyPassword(i),'btn-secondary','copy'),makeButton('Bearbeiten',()=>openEditor(i),'btn-secondary','edit'),makeButton('Löschen',()=>deleteEntry(i),'btn-danger','trash'));if(showIcons){const mark=document.createElement('div');mark.className='site-mark';mark.setAttribute('aria-hidden','true');mark.textContent=siteInitial(e.url);card.append(mark);}card.append(main,actions);c.append(card);}}
+function compactIconButton(name,label,fn){
+ const button=document.createElement('button');button.type='button';button.className='entry-icon-button';
+ button.title=label;button.setAttribute('aria-label',label);button.append(makeIcon(name));button.addEventListener('click',fn);return button;
+}
+function renderPasswords(){
+ const container=$('passwordsContainer');container.replaceChildren();if(!active())return;
+ const q=$('search').value.toLocaleLowerCase('de'),sort=$('sort').value;
+ const found=decryptedVault.map((e,i)=>({e,i})).filter(({e})=>(e.url+' '+e.username).toLocaleLowerCase('de').includes(q));
+ found.sort((a,b)=>{if(sort==='newest')return (b.e.updatedAt||'').localeCompare(a.e.updatedAt||'');if(sort==='oldest')return (a.e.updatedAt||'').localeCompare(b.e.updatedAt||'');return String(a.e[sort]||'').localeCompare(String(b.e[sort]||''),'de');});
+ if(!found.length){const p=document.createElement('p');p.textContent='Keine passenden Einträge.';container.append(p);return;}
+ for(const {e,i} of found){
+  const card=document.createElement('article');card.className='password-card';
+  if(showIcons){const mark=document.createElement('div');mark.className='site-mark';mark.setAttribute('aria-hidden','true');mark.textContent=siteInitial(e.url);card.append(mark);}
+  const main=document.createElement('div');main.className='entry-main';
+  const header=document.createElement('div');header.className='entry-header';
+  const heading=document.createElement('h3');heading.textContent=e.url;header.append(heading);
+  const menu=document.createElement('details');menu.className='entry-menu';
+  const toggle=document.createElement('summary');toggle.title='Weitere Aktionen';toggle.setAttribute('aria-label','Weitere Aktionen für '+e.url);toggle.append(makeIcon('more'));menu.append(toggle);
+  const menuContent=document.createElement('div');menuContent.className='entry-menu-content';
+  menuContent.append(makeButton('Bearbeiten',()=>{menu.open=false;openEditor(i);},'btn-secondary','edit'),makeButton('Löschen',()=>{menu.open=false;deleteEntry(i);},'btn-danger','trash'));
+  menu.append(menuContent);header.append(menu);main.append(header);
+  const userRow=document.createElement('div');userRow.className='entry-detail-row';
+  const userText=document.createElement('span');userText.className='entry-detail-text';userText.textContent='Benutzername: '+e.username;
+  userRow.append(userText,compactIconButton('copy','Benutzername kopieren',()=>copyEntryField(i,'username')));
+  const passwordRow=document.createElement('div');passwordRow.className='entry-detail-row';
+  const passwordText=document.createElement('span');passwordText.className='entry-detail-text';
+  const passwordValue=document.createElement('span');passwordValue.textContent=revealed.has(i)?e.password:'••••••••';
+  passwordText.append('Passwort: ',passwordValue);
+  const eye=compactIconButton(revealed.has(i)?'hide':'eye',revealed.has(i)?'Passwort verbergen':'Passwort anzeigen',()=>{
+   if(revealed.has(i))revealed.delete(i);else revealed.add(i);
+   passwordValue.textContent=revealed.has(i)?e.password:'••••••••';
+   eye.replaceChildren(makeIcon(revealed.has(i)?'hide':'eye'));
+   eye.title=revealed.has(i)?'Passwort verbergen':'Passwort anzeigen';eye.setAttribute('aria-label',eye.title);
+  });
+  passwordRow.append(passwordText,eye,compactIconButton('copy','Passwort kopieren',()=>copyPassword(i)));
+  main.append(userRow,passwordRow);card.append(main);container.append(card);
+ }
+}
 async function exportVaultFile(){
     if(!active()||busy)return;
     busy=true;
