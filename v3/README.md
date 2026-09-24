@@ -208,3 +208,10 @@ EN: After selecting an .enc file, the master-password prompt expands directly be
 **DE:** Die sichtbare Überschrift und der Browser-Tab heißen jetzt „🔐 Web-Passwortmanager“ bzw. „Web-Passwortmanager“. Die bisherigen Zusätze „3.0“ und „Browser-Testversion“ wurden aus diesen Anzeigen entfernt. Die interne Versionshistorie und die Funktionalität bleiben unverändert.
 
 **EN:** The visible heading and browser tab are now named “🔐 Web-Passwortmanager” and “Web-Passwortmanager”, respectively. The previous “3.0” and “Browser test version” labels have been removed from these displays. Internal version history and functionality are unchanged.
+
+
+### Überschrift / Heading (2026-09-24)
+
+**DE:** Die sichtbare Überschrift lautet jetzt „🔐 Web Passwort Manager“ (mit Leerzeichen) und ist etwas größer (2 rem), angelehnt an Version 2.0. Der Browser-Tab lautet „Web Passwort Manager“. An Funktionen und anderen Ansichten wurde nichts geändert.
+
+**EN:** The visible heading now reads “🔐 Web Passwort Manager” (with spaces) and is slightly larger (2 rem), matching the version 2.0 style. The browser tab reads “Web Passwort Manager”. No functionality or other views were changed.
