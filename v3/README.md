@@ -1,159 +1,113 @@
-# 🔐 Web Passwort Manager
-
-**Sprache wählen / Choose your language:** [🇩🇪 Deutsch](#deutsch) · [🇬🇧 English](#english)
-
----
-
 <a id="deutsch"></a>
-# 🇩🇪 Deutsch
 
-## Überblick
+# 🔐 Passwort Manager 2.0
 
-Der **Web Passwort Manager** ist eine browserbasierte Anwendung zum Verwalten verschlüsselter Passwort-Tresore (`.enc`). Ein Tresor kann mehrere Einträge enthalten; die Anwendung bietet Suche, Sortierung, Passwortgenerator, Import und einen Vergleich zweier Tresore. Die Oberfläche orientiert sich am kompakten, dunklen Design der früheren Version 2.0.
+**Sprache / Language:** [Deutsch](#deutsch) · [English](#english)
 
-> **Wichtig:** Diese Anwendung ist ein Entwicklungsstand und wurde nicht unabhängig sicherheitsgeprüft. Bewahre zusätzliche, extern gesicherte Kopien deiner `.enc`-Dateien auf. Verlasse dich nicht ausschließlich auf die Notfall-Wiederherstellung im Browser.
+Ein clientseitiger Passwortmanager für PC und Smartphone. Verschlüsselte `.enc`-Dateien sind die eigentlichen Tresore; der Browser hält bei Bedarf einen **verschlüsselten Zwischenstand** bereit. Ein Backend oder Benutzerkonto ist für die Tresorverwaltung nicht erforderlich.
 
-## Starten
+> **Wichtig:** Diese Version ist eine Testversion. Eine unabhängige Sicherheitsprüfung ist nicht dokumentiert. Bitte alle Abläufe zunächst mit Test-Tresoren prüfen.
 
-1. Die Dateien `index.html`, `app.js` und `crypto_neu.js` **gemeinsam** auf einem HTTPS-Webserver bereitstellen, beispielsweise über GitHub Pages. Für lokale Tests einen lokalen HTTP-Server verwenden.
-2. Die Seite öffnen und entweder eine bestehende `.enc`-Datei auswählen oder einen neuen Tresor erstellen.
-3. Das Master-Passwort eingeben. Passwortfelder sind standardmäßig verdeckt; über das Augen-Symbol kann die Eingabe angezeigt werden.
-4. Bei einem neuen Tresor die angebotene `.enc`-Datei herunterladen und an einem sicheren Ort aufbewahren. Einen Export anschließend über **„.enc prüfen“** bestätigen.
+## 🚀 Erste Schritte
 
-Die App besteht aus statischen Dateien; es ist kein eigener Anwendungsserver vorgesehen. Browserfunktionen für direkten Dateizugriff können je nach Browser und Bereitstellung fehlen.
+1. Öffne die Anwendung über [GitHub Pages](https://tkris.github.io/passwortmanager/) oder in einer geeigneten lokalen Browserumgebung.
+2. Wähle **„Tresor öffnen“**, um eine vorhandene `.enc`-Datei auszuwählen und mit ihrem Master-Passwort zu entsperren, oder **„Neuen Tresor erstellen“**. Bei der Neuanlage gibst du das Master-Passwort zweimal ein und speicherst den neuen Tresor anschließend als `.enc`-Datei.
+3. Verwalte deine Einträge, nutze Suche, Sortierung und Passwortgenerator. Speichere nach Änderungen eine **aktuelle `.enc`-Datei** und prüfe, ob sie sich öffnen lässt.
 
-## Tresor und Einträge
+**Ein vorhandener Zwischenstand:** Über **„Zwischengespeicherte Arbeit fortsetzen“** kannst du nach erneutem Öffnen der App weiterarbeiten (Master-Passwort erforderlich). Solange ein Zwischenstand vorhanden ist, bleibt **„Neuen Tresor erstellen“** gesperrt. Beim Speichern wird die `.enc`-Datei ohne anschließende Bestätigungs- oder Sperrfrage zum Download angeboten; der Tresor bleibt geöffnet. Der verschlüsselte Zwischenstand bleibt vorsichtshalber erhalten, bis du ihn auf der Startseite ausdrücklich löschst. Über **„Zwischenspeicher löschen“** auf der Startseite kannst du den verschlüsselten Zwischenstand nach ausdrücklicher Bestätigung auch ohne Export endgültig entfernen. Dabei gehen nicht exportierte Änderungen verloren; bereits gespeicherte `.enc`-Dateien bleiben unverändert. Danach kannst du wieder einen neuen Tresor erstellen. Nur bei einem **neu erstellten, noch nie befüllten Tresor** erscheint **„Tresor verwerfen“**. Nach dem ersten hinzugefügten Eintrag oder beim Öffnen einer bestehenden `.enc`-Datei steht diese Aktion nicht zur Verfügung.
 
-- **Startseite:** „.enc-Datei öffnen“ und „Neuen Tresor anlegen“ zeigen ihre Passwortformulare direkt auf der Startseite an. Jeweils nur ein Startseitenformular ist geöffnet.
-- **Einträge:** Websites/URLs, Benutzernamen und Passwörter hinzufügen, bearbeiten, löschen, suchen und kopieren. Passwörter lassen sich bei Bedarf über das Auge einblenden.
-- **Passwortgenerator:** 8–64 Zeichen (Vorgabe: 20); Klein- und Großbuchstaben, Zahlen und Sonderzeichen können ausgewählt werden.
-- **Sortierung:** Website A–Z/Z–A, „Zuletzt hinzugefügt“ und „Zuletzt geändert“. Bei älteren Einträgen ohne gespeicherte Zeitstempel lässt sich das ursprüngliche Datum nicht nachträglich bestimmen.
-- **Scrollbare Liste:** Die Passwortkarten haben einen eigenen Scrollbereich; Suche, Sortierung, Aktionen und Speicherstatus bleiben außerhalb der Liste. Die maximale Listenhöhe beträgt 420 px, auf schmalen Bildschirmen 440 px. Abweichende Kartenhöhen können früheres Scrollen erfordern.
+## ✨ Funktionen
 
-## Speichern, Exportieren und Prüfen
+- Einträge hinzufügen, bearbeiten, löschen, suchen und sortieren; Passwörter erzeugen, anzeigen und kopieren.
+- **„Einträge aus Tresor importieren“:** Einträge aus einer zweiten verschlüsselten `.enc`-Datei übernehmen. Die zweite Datei wird mit ihrem eigenen Master-Passwort geöffnet; Unterschiede können in einer Vergleichsansicht geprüft werden.
+- **„Tresore synchronisieren“:** Zwei `.enc`-Dateien manuell vergleichen und Unterschiede beziehungsweise Konflikte gezielt zusammenführen. Das Ergebnis kann als neue `.enc`-Datei heruntergeladen oder in den geöffneten Tresor übernommen und verschlüsselt zwischengespeichert werden. Die Ergebnisdatei verwendet das Master-Passwort des zuerst geöffneten Tresors.
+- Tresor manuell oder nach einer einstellbaren Inaktivitätszeit sperren; Master-Passwort ändern.
+- Einen früheren Browser-Tresor über **„Tresor öffnen → Alten Browser-Tresor für Export öffnen“** für den Umstieg als `.enc`-Datei exportieren.
 
-**Die `.enc`-Datei ist der maßgebliche gespeicherte Tresor.** Änderungen im geöffneten Tresor sind nicht automatisch dauerhaft in dieser Datei gespeichert.
+## 💾 Speicherung und Wiederherstellung
 
-| Anzeige / Aktion | Bedeutung |
-| --- | --- |
-| **Nicht gespeichert** (orange) | Änderungen sind noch nicht bestätigt in einer `.enc`-Datei gesichert. |
-| **Datei speichern** | Bei unterstütztem, beschreibbarem Dateizugriff wird die geöffnete Datei geschrieben und danach erneut gelesen und geprüft. |
-| **.enc exportieren** | Bietet eine verschlüsselte Datei zum Download an; der Download allein bestätigt kein erfolgreiches Ablegen. |
-| **Nicht bestätigt** (orange) | Ein exportierter Stand wartet noch auf Prüfung. |
-| **.enc prüfen** | Die tatsächlich gespeicherte/heruntergeladene Datei auswählen und mit dem passenden Master-Passwort prüfen. Tresor-ID und Einträge müssen zum aktuellen Stand passen. |
-| **Gespeichert** (grün) | Der aktuelle Stand wurde durch direktes Schreiben mit Prüfung oder durch erfolgreiche Prüfung der ausgewählten Exportdatei bestätigt. |
+Änderungen werden **verschlüsselt im Browser zwischengespeichert**, aber die ursprünglich ausgewählte `.enc`-Datei wird **nicht automatisch aktualisiert**. Ein gestarteter Download ist kein Nachweis, dass die Datei tatsächlich gespeichert wurde. Prüfe den Download, bevor du eine ältere Datei ersetzt oder den Zwischenspeicher ausdrücklich löschst.
 
-Die Prüfung eines Exports bestätigt **nur die ausgewählte Datei**. Sie ersetzt keine ältere Datei an einem anderen Speicherort. Bewahre die bestätigte Datei auf und öffne beim nächsten Mal diese Fassung.
+Der Zwischenstand ist der ursprünglich geöffneten Datei zugeordnet. Beim erneuten Öffnen kann die App eine Wiederherstellung anbieten. Ein Zwischenstand einer anderen Datei wird nicht stillschweigend überschrieben. Die aktuelle Version unterstützt **nur einen lokalen Zwischenstand gleichzeitig**.
 
-## Notfall-Wiederherstellung
+Beim Synchronisieren werden **beide Quelldateien nicht automatisch überschrieben**. Wenn beide Speicherorte denselben Stand erhalten sollen, speichere das geprüfte Ergebnis selbst an beiden Orten. Eine automatische Synchronisierung über Netzwerk oder Cloud ist nicht enthalten.
 
-Bei ungespeicherten Änderungen versucht die Anwendung, einen **verschlüsselten Notfall-Zwischenstand** im Browser (IndexedDB) anzulegen. Mehrere Tresore können getrennte Zwischenstände besitzen. Auf der Startseite erscheint die Notfall-Wiederherstellung nur, wenn entsprechende Zwischenstände vorhanden sind. Jeder Zwischenstand hat eine eigene, direkt darunter aufklappbare Master-Passwortabfrage; beim Wechsel wird die vorherige Eingabe geleert. **„Abbrechen“ löscht keinen Zwischenstand.**
+## 🔒 Sicherheit
 
-Ein Zwischenstand wird nur nach erfolgreicher Entschlüsselung und den vorgesehenen Tresor-/Dateistandsprüfungen übernommen. Browserdaten können unabhängig von der App gelöscht werden. Ein Zwischenstand ersetzt deshalb **keine externe Sicherung** und ist nicht gleichbedeutend mit einer bestätigten Speicherung in der `.enc`-Datei.
+Die Ver- und Entschlüsselung erfolgt clientseitig mit der Web Crypto API. Die dokumentierten kryptografischen Parameter sind AES-GCM (256 Bit), PBKDF2 mit SHA-256 (600.000 Iterationen), 16 Byte Salt und 12 Byte IV. Eine unabhängige Prüfung der Implementierung ist nicht dokumentiert.
 
-## Import und Tresorvergleich
+**Der Browser-Zwischenspeicher ist kein Backup.** Das Löschen von Browserdaten kann nicht exportierte Änderungen vernichten. Bewahre aktuelle `.enc`-Dateien an einem sicheren Ort auf und vergiss dein Master-Passwort nicht: Es gibt keine serverseitige Zurücksetzen-Funktion. Ein kompromittiertes Gerät, schädliche Erweiterungen oder manipulierter JavaScript-Code können auch bei clientseitiger Verschlüsselung ein Risiko darstellen.
 
-Über **„Einträge aus Tresor importieren“** oder **„Tresore synchronisieren (Diff)“** eine zweite `.enc`-Datei auswählen und mit deren Master-Passwort entschlüsseln. Die angezeigten neuen bzw. abweichenden Einträge einzeln oder über **„Alle übernehmen“** auswählen. Die zweite Datei wird dabei nur gelesen; es findet **keine automatische bidirektionale Synchronisation** und keine automatische Übernahme von Löschungen statt. Übernommene Änderungen im geöffneten Tresor müssen anschließend gespeichert oder exportiert **und geprüft** werden. Die entsprechende Benachrichtigung ist orange, weil die Übernahme gelungen, aber noch nicht gespeichert ist.
+**Keine echten Zugangsdaten, Master-Passwörter oder persönlichen `.enc`-Dateien in das öffentliche GitHub-Repository hochladen.** Teste Neuanlage, Export, Wiederherstellung, Import, Synchronisierung und Master-Passwort-Wechsel vor der produktiven Nutzung mit Testdaten.
 
-## Sperre, Einstellungen und Master-Passwort
+## 🛠️ Projektdateien
 
-- **Automatische Sperre:** Nach 1, 5, 10, 15 oder 30 Minuten Inaktivität; standardmäßig 5 Minuten. „Niemals sperren“ ist ebenfalls wählbar. Nach dem Sperren kann der Tresor auf derselben Seite mit dem Master-Passwort entsperrt werden. Ein Neuladen oder Schließen beendet diese Sitzung.
-- **Einstellungen:** Website-Kürzel ein-/ausblenden, Sperrzeit einstellen und Master-Passwort ändern.
-- **Master-Passwort ändern:** Bisheriges Passwort eingeben, neues Passwort zweimal eingeben. Ein leeres neues Passwort ist nicht erlaubt; bei kurzen Passwörtern erscheint ein Sicherheitshinweis. Bei direktem Schreibzugriff wird die Datei geschrieben und geprüft; andernfalls muss die neu exportierte `.enc`-Datei mit dem **neuen** Master-Passwort über „.enc prüfen“ bestätigt werden. Die ursprüngliche Datei bleibt bis dahin erhalten. Vorher eine externe Sicherungskopie erstellen.
-- **Passwortdialoge:** Master-Passwörter beim Import, Vergleich und bei der `.enc`-Prüfung werden in eigenen Dialogen standardmäßig verdeckt eingegeben. Das Auge schaltet die Sichtbarkeit um; beim Schließen wird die Eingabe geleert.
+| Datei | Aufgabe |
+|---|---|
+| `index.html` | Oberfläche und Layout |
+| `app.js` | Tresorverwaltung, Generator, Import und Synchronisierung |
+| `crypto_neu.js` | Clientseitige Verschlüsselung |
 
-## Hinweise und Grenzen
+Für manche Browserfunktionen ist eine sichere Umgebung wie HTTPS oder `localhost` erforderlich.
 
-- Die ältere **Version 2.0 bleibt ein separates Projekt**. Bestehende 2.0-Dateien können geöffnet werden; ein neu exportiertes Tresorformat mit Tresor-ID ist jedoch nicht automatisch mit der alten 2.0-Anwendung kompatibel. Vor dem Umstieg Sicherung und Rückweg prüfen.
-- Direkter Dateizugriff ist browserabhängig. Ein Export und seine anschließende Prüfung bestätigen die ausgewählte Datei, nicht die Synchronisation durch einen externen Cloud-Anbieter.
-- Die Anwendung bietet keine garantierte Wiederherstellung bei gelöschten Browserdaten, beschädigten Dateien oder verlorenem Master-Passwort.
-- Es liegen keine vollständigen automatisierten Browser- oder unabhängigen Sicherheitstests vor. Mehrere gleichzeitig geöffnete Tabs desselben Tresors können Konflikte verursachen.
+## 🤖 Entwicklung
 
-## Projektdateien
-
-| Datei | Zweck |
-| --- | --- |
-| `index.html` | Oberfläche und Gestaltung |
-| `app.js` | Tresor-, Datei- und Bedienlogik |
-| `crypto_neu.js` | Verschlüsselungs-/Entschlüsselungsfunktionen |
-| `README.md` | Diese Anleitung |
-
-[↑ Zur Sprachauswahl](#-web-passwort-manager)
+Quellcode und Benutzeroberfläche wurden mit Unterstützung von KI erstellt und schrittweise erweitert. KI-Unterstützung ersetzt keine Codeprüfung oder Sicherheitszertifizierung.
 
 ---
 
 <a id="english"></a>
-# 🇬🇧 English
 
-## Overview
+# 🔐 Password Manager 2.0
 
-**Web Passwort Manager** is a browser-based application for managing encrypted password vaults (`.enc`). A vault can contain multiple entries; the application provides search, sorting, a password generator, importing, and comparison between two vaults. Its compact dark interface follows the earlier version 2.0 design.
 
-> **Important:** This is a development build and has not undergone an independent security audit. Keep additional external backups of your `.enc` files. Do not rely on browser emergency recovery as your only backup.
 
-## Getting started
+A client-side password manager for desktop and mobile browsers. Encrypted `.enc` files are the primary vaults; the browser can retain an **encrypted local draft**. No backend or user account is required to manage vaults.
 
-1. Serve `index.html`, `app.js`, and `crypto_neu.js` **together** over HTTPS, for example using GitHub Pages. Use a local HTTP server for local testing.
-2. Open the page and select an existing `.enc` file or create a new vault.
-3. Enter the master password. Password fields are masked by default; use the eye icon to reveal the input when needed.
-4. For a new vault, download the offered `.enc` file and keep it somewhere safe. Confirm an export using **“.enc prüfen” (Verify .enc)**.
+> **Important:** This is a test version. No independent security audit is documented. Test all workflows with sample vaults first.
 
-The app uses static files and does not require a dedicated application server. Direct file access may be unavailable in some browsers or deployment environments.
+## 🚀 Getting started
 
-## Vaults and entries
+1. Open the app on [GitHub Pages](https://tkris.github.io/passwortmanager/) or in a suitable local browser environment.
+2. Select **“Tresor öffnen” (Open vault)** to choose an existing `.enc` file and unlock it with its master password, or **“Neuen Tresor erstellen” (Create new vault)**. When creating a vault, enter the master password twice, then save the new vault as an `.enc` file.
+3. Manage entries using search, sorting and the password generator. After making changes, save an **updated `.enc` file** and verify that it can be opened.
 
-- **Home screen:** Opening an `.enc` file and creating a vault display their password forms inline on the home screen. Only one home-screen form is open at a time.
-- **Entries:** Add, edit, delete, search, and copy websites/URLs, usernames, and passwords. The eye icon can reveal a password when needed.
-- **Password generator:** 8–64 characters (default: 20); choose lowercase and uppercase letters, digits, and special characters.
-- **Sorting:** Website A–Z/Z–A, Recently added, and Recently changed. Original timestamps cannot be reconstructed for older entries that lack them.
-- **Scrollable list:** Password cards scroll independently; search, sorting, actions, and save status stay outside the list. Maximum list height is 420 px, or 440 px on narrow screens. Taller cards may require scrolling sooner.
+**If a local draft exists:** Select **“Zwischengespeicherte Arbeit fortsetzen” (Resume cached work)** to continue after reopening the app (master password required). **Create new vault** is disabled while a draft exists. Saving offers an `.enc` file for download without additional confirmation or lock prompts; the vault stays open. The encrypted draft remains available until you explicitly delete it from the start screen. Use **“Zwischenspeicher löschen” (Delete cached vault)** on the start screen to permanently delete the encrypted draft after explicit confirmation, without exporting it. Unexported changes will be lost, existing `.enc` files remain untouched, and new vault creation becomes available again. **“Tresor verwerfen” (Discard vault)** is available only for a **newly created vault that has never contained an entry**. It disappears after the first entry is added and is not offered for existing `.enc` files.
 
-## Saving, exporting, and verifying
+## ✨ Features
 
-**The `.enc` file is the authoritative saved vault.** Changes in an open vault are not automatically saved permanently to that file.
+- Add, edit, delete, search and sort entries; generate, reveal and copy passwords.
+- **“Einträge aus Tresor importieren” (Import entries from vault):** Import entries from a second encrypted `.enc` file. Unlock the source file using its own master password and review differences in the comparison view.
+- **“Tresore synchronisieren” (Synchronize vaults):** Manually compare two `.enc` files and resolve differences or conflicts. Download the merged result as a new `.enc` file or apply it to the open vault and cache it in encrypted form. The resulting file uses the master password of the vault opened first.
+- Lock the vault manually or after a configurable period of inactivity; change the master password.
+- For migration, open a legacy browser vault via **“Tresor öffnen → Alten Browser-Tresor für Export öffnen”** and export it as an `.enc` file.
 
-| Status / action | Meaning |
-| --- | --- |
-| **Nicht gespeichert** (Not saved; orange) | Changes have not yet been confirmed in an `.enc` file. |
-| **Datei speichern** (Save file) | Where writable file access is supported, writes the open file and reads it back for verification. |
-| **.enc exportieren** (Export .enc) | Offers an encrypted download; the download alone does not prove that the file was saved. |
-| **Nicht bestätigt** (Not confirmed; orange) | An exported version is awaiting verification. |
-| **.enc prüfen** (Verify .enc) | Select the actual downloaded/saved file and enter its master password. Vault ID and entries must match the current vault. |
-| **Gespeichert** (Saved; green) | The current state has been confirmed by a verified direct write or successful verification of the selected export. |
+## 💾 Saving and recovery
 
-Export verification confirms **only the selected file**. It does not replace an older copy elsewhere. Keep the verified file and open that copy next time.
+Changes are **cached in encrypted form in the browser**, but the originally selected `.enc` file is **not updated automatically**. Starting a download does not prove the file was saved successfully. Check the downloaded file before replacing an older copy or explicitly deleting the cached draft.
 
-## Emergency recovery
+The local draft is associated with the file originally opened. The app can offer recovery when that file is reopened. A draft belonging to another file is not silently overwritten. The current version supports **only one local draft at a time**.
 
-When there are unsaved changes, the application attempts to store an **encrypted emergency draft** in the browser (IndexedDB). Multiple vaults can have separate drafts. The home screen displays recovery only when drafts are present. Each draft has its own expandable master-password form directly below it; switching forms clears the previous input. **Cancel does not delete a draft.**
+During synchronization, **neither source file is overwritten automatically**. To keep two storage locations in sync, save the verified merged file to both locations yourself. Automatic network or cloud synchronization is not included.
 
-A draft is applied only after successful decryption and the relevant vault/file-state checks. Browser data can be deleted independently of the app. Emergency drafts are **not external backups** and do not mean that the `.enc` file has been saved.
+## 🔒 Security
 
-## Importing and comparing vaults
+Encryption and decryption take place client-side using the Web Crypto API. The documented cryptographic parameters are AES-GCM (256-bit), PBKDF2 with SHA-256 (600,000 iterations), a 16-byte salt and a 12-byte IV. No independent audit of the implementation is documented.
 
-Use **“Einträge aus Tresor importieren” (Import entries from vault)** or **“Tresore synchronisieren (Diff)” (Compare vaults)** to select a second `.enc` file and decrypt it using its master password. Select individual new or differing entries, or choose **“Alle übernehmen” (Select all)**. The second file is read-only: there is **no automatic two-way synchronization** and deletions are not propagated automatically. Applied changes to the open vault must subsequently be saved or exported **and verified**. The import notification is orange because applying entries succeeded but saving is still pending.
+**The browser cache is not a backup.** Clearing browser data can destroy changes that have not been exported. Keep current `.enc` files in a safe location and do not forget your master password: there is no server-side password reset. A compromised device, malicious extensions or modified JavaScript can pose risks even with client-side encryption.
 
-## Locking, settings, and master password
+**Do not commit real credentials, master passwords or personal `.enc` files to the public GitHub repository.** Test vault creation, export, recovery, import, synchronization and master-password changes with sample data before using the app for important credentials.
 
-- **Automatic lock:** After 1, 5, 10, 15, or 30 minutes of inactivity; default is 5 minutes. “Never lock” is also available. Unlock on the same page with the master password. Reloading or closing the page ends that session.
-- **Settings:** Toggle website initials, choose the lock interval, and change the master password.
-- **Change master password:** Enter the current password and the new password twice. An empty new password is not allowed; short passwords trigger a security warning. With direct writable file access, the file is written and verified; otherwise the newly exported `.enc` file must be confirmed with the **new** master password via “.enc prüfen”. The original file remains in place until then. Make an external backup first.
-- **Password dialogs:** Master-password prompts for import, comparison, and `.enc` verification use in-app dialogs with masked input by default. The eye icon toggles visibility, and closing the dialog clears its input.
-
-## Notes and limitations
-
-- The older **version 2.0 remains a separate project**. Existing 2.0 files can be opened, but a newly exported vault format with a vault ID is not automatically compatible with the old 2.0 app. Back up files and verify your rollback path before migrating.
-- Direct file access depends on the browser. Export verification confirms the selected file, not synchronization performed by an external cloud provider.
-- Recovery is not guaranteed if browser data is cleared, files are damaged, or the master password is lost.
-- Full automated browser testing and independent security auditing have not been completed. Opening the same vault in multiple tabs may lead to conflicts.
-
-## Project files
+## 🛠️ Project files
 
 | File | Purpose |
-| --- | --- |
-| `index.html` | Interface and styling |
-| `app.js` | Vault, file, and interaction logic |
-| `crypto_neu.js` | Encryption/decryption functions |
-| `README.md` | This guide |
+|---|---|
+| `index.html` | Interface and layout |
+| `app.js` | Vault management, generator, import and synchronization |
+| `crypto_neu.js` | Client-side encryption |
 
-[↑ Back to language selection](#-web-passwort-manager)
+Some browser features require a secure context such as HTTPS or `localhost`.
+
+## 🤖 Development
+
+The source code and interface were created and extended with AI assistance. AI assistance does not replace code review or security certification.
