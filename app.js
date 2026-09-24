@@ -71,6 +71,7 @@ function updateStartScreen(){
     $('resumeDraftButton').classList.toggle('hidden',localStorage.getItem(DRAFT)===null);
     $('deleteDraftButton').classList.toggle('hidden',!hasDraft);
     $('draftWarningBox').classList.toggle('hidden',!hasDraft);
+    $('emergencyDraftSection').classList.toggle('hidden',!hasDraft);
     if(!hasDraft){$('deleteDraftForm').classList.add('hidden');$('deleteDraftPassword').value='';}
 }
 async function identityOf(raw){const bytes=new TextEncoder().encode(raw),digest=await crypto.subtle.digest('SHA-256',bytes);return Array.from(new Uint8Array(digest),b=>b.toString(16).padStart(2,'0')).join('');}
