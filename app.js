@@ -40,7 +40,7 @@ async function lockVault(reason='manual'){
     if(!active()||busy)return;
     // A clean external file receives a resumable encrypted copy only on locking,
     // and only if the single cache is unoccupied. Never replace another vault.
-    if(source==='file'&&!dirty&&!draftProtectionBlocked&&localStorage.getItem(DRAFT)===null){
+    if(reason!=='close-without-saving'&&source==='file'&&!dirty&&!draftProtectionBlocked&&localStorage.getItem(DRAFT)===null){
         busy=true;
         try{await saveDraft(decryptedVault);}
         catch(e){console.error('Zwischenspeichern beim Sperren:',e.name);if(reason==='manual'&&!confirm('Der Tresor konnte nicht zwischengespeichert werden. Die ausgewählte .enc-Datei bleibt unverändert. Trotzdem sperren?')){busy=false;return;}}
@@ -83,7 +83,9 @@ function canCacheCurrentVault(){
     try{return JSON.parse(stored).identity===vaultIdentity;}catch{return false;}
 }
 function updateSaveStatus(){
-    $('discardVaultButton').classList.toggle('hidden',!(source==='file'&&vaultIdentity&&discardEligible&&decryptedVault.length===0&&hasOwnDraft()));
+    const canDiscard=source==='file'&&vaultIdentity&&discardEligible&&decryptedVault.length===0&&hasOwnDraft();
+    $('discardVaultButton').classList.toggle('hidden',!canDiscard);
+    $('closeWithoutSavingButton').classList.toggle('hidden',source!=='file'||canDiscard);
     updateAutoLockControl();
     const risky=autoLockBlocked();
     $('saveStatus').classList.toggle('vault-risk',risky);
@@ -187,6 +189,26 @@ $('discardVaultButton').addEventListener('click',()=>{
     if(!draft||draft.identity!==vaultIdentity||draft.discardEligible!==true){message('Nur ein neu erstellter, noch nie befüllter Tresor kann verworfen werden.');updateSaveStatus();return;}
     if(!confirm('Tresor wirklich verwerfen? Der verschlüsselte Zwischenstand und alle darin enthaltenen, nicht als .enc-Datei exportierten Änderungen werden dauerhaft aus diesem Browser gelöscht. Bereits gespeicherte .enc-Dateien bleiben unverändert.'))return;
     try{const current=JSON.parse(localStorage.getItem(DRAFT)||'null');if(!current||current.identity!==vaultIdentity||current.discardEligible!==true||!discardEligible||decryptedVault.length!==0)throw Error('Zwischenstand ist nicht mehr zum Verwerfen freigegeben.');localStorage.removeItem(DRAFT);if(localStorage.getItem(DRAFT)!==null)throw Error('Zwischenstand konnte nicht gelöscht werden.');dirty=false;lockVault();message('Zwischenstand verworfen. Bereits gespeicherte .enc-Dateien bleiben unverändert.');}catch(e){message('Verwerfen fehlgeschlagen: '+e.message);}
+});
+$('closeWithoutSavingButton').addEventListener('click',async()=>{
+    if(!active()||busy||source!=='file'||!vaultIdentity)return;
+    if(!confirm('Tresor ohne Speichern schließen?\n\nNicht als .enc-Datei exportierte Änderungen und der zu diesem Tresor gehörende Zwischenstand werden gelöscht. Bereits gespeicherte .enc-Dateien bleiben unverändert.'))return;
+    busy=true;
+    try{
+        // Only remove the current vault's cache. Never touch another vault's draft.
+        const saved=localStorage.getItem(DRAFT);
+        if(saved!==null){
+            const draft=JSON.parse(saved);
+            if(draft?.identity===vaultIdentity){
+                localStorage.removeItem(DRAFT);
+                if(localStorage.getItem(DRAFT)!==null)throw Error('Zwischenstand konnte nicht gelöscht werden.');
+            }
+        }
+        dirty=false;
+    }catch(e){message('Schließen fehlgeschlagen: Zwischenspeicher konnte nicht sicher gelöscht werden. '+e.message);busy=false;return;}
+    busy=false;
+    await lockVault('close-without-saving');
+    message('Tresor ohne Speichern geschlossen. Bereits gespeicherte .enc-Dateien bleiben unverändert.');
 });
 $('deleteDraftButton').addEventListener('click',()=>{
     if(busy||$('sourceSelect').classList.contains('hidden'))return;
