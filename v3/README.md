@@ -222,3 +222,10 @@ EN: After selecting an .enc file, the master-password prompt expands directly be
 DE: Die Passwortkarten werden ab einer maximalen Listenhöhe von 340 px (mobil: 280 px) innerhalb der Liste gescrollt. Suche, Sortierung, Aktionen und Speicherstatus bleiben außerhalb des Scrollbereichs. Das Drei-Punkte-Menü wird über der Liste angezeigt und beim Scrollen geschlossen.
 
 EN: Password cards scroll inside their own list after reaching a maximum height of 340 px (280 px on mobile). Search, sorting, actions, and save status stay outside the scroll area. The three-dot menu floats above the list and closes when scrolling.
+
+
+### Passwortliste: drei Einträge sichtbar / Password list: three entries visible
+
+DE: Die maximale Höhe der scrollbaren Passwortliste wurde auf 420 px (schmale Bildschirme: 440 px) erhöht, damit drei Eintragskarten in der üblichen Darstellung vollständig sichtbar sind. Bei längeren Einträgen oder abweichender Schriftgröße kann weiterhin Scrollen nötig sein.
+
+EN: The scrollable password list maximum height was increased to 420 px (narrow screens: 440 px) to fit three complete entry cards in the usual layout. Longer entries or different font sizes may still require scrolling.
