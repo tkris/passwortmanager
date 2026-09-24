@@ -172,3 +172,9 @@ EN: On narrow screens (up to 680 px), the username and password copy icons align
 
 - DE: Auf schmalen Bildschirmen steht das Auge direkt rechts neben dem Passwort. Das Kopiersymbol bleibt rechts am Kartenrand unter dem Drei-Punkte-Menü. Die Desktop-Anordnung und die Funktionen bleiben unverändert.
 - EN: On narrow screens, the visibility icon sits immediately to the right of the password. The copy icon stays at the right edge beneath the three-dot menu. Desktop layout and functionality are unchanged.
+
+### Aktionsbuttons bei schmalem Fenster / Action buttons in narrow windows
+
+DE: Aktionsbuttons in derselben Zeile (insbesondere „Neues Passwort“ und „Einträge aus Tresor importieren“) sind gleich hoch, auch wenn eine Beschriftung umbricht. Die bisherige Anordnung und die Funktionen bleiben unverändert.
+
+EN: Action buttons sharing a row (particularly “New password” and “Import entries from vault”) have equal heights even when a label wraps. Existing layout and functionality remain unchanged.
