@@ -236,3 +236,23 @@ EN: The scrollable password list maximum height was increased to 420 px (narrow 
 DE: Das Sortierfeld bietet zusätzlich „Zuletzt hinzugefügt“ und „Zuletzt geändert“. Neue Einträge erhalten Erstellungs- und Änderungszeitpunkt; bearbeitete Einträge erhalten einen neuen Änderungszeitpunkt. Beim Import erhalten neu übernommene Einträge den Zeitpunkt der Übernahme; bei ersetzten Einträgen bleibt ein vorhandener Erstellungszeitpunkt erhalten und der Änderungszeitpunkt wird aktualisiert. Diese Metadaten werden im verschlüsselten Tresor gespeichert und müssen wie andere Änderungen gespeichert bzw. geprüft werden. Für ältere Einträge ohne Zeitstempel werden keine historischen Daten erfunden: Sie erscheinen bei den Datumssortierungen nach Einträgen mit bekanntem Datum in ihrer bisherigen Reihenfolge. Die Sortierauswahl selbst ändert den Tresor nicht.
 
 EN: The sort menu now includes “Recently added” and “Recently changed”. New entries receive creation and modification timestamps; editing updates the modification timestamp. Newly imported entries receive the import time; replacing an entry preserves its known creation time and updates its modification time. This metadata is stored in the encrypted vault and must be saved/verified like other changes. Older entries without timestamps retain unknown dates and appear after dated entries in their original order. Changing the sort selection does not modify the vault.
+
+
+### Kompakte Sperransicht / Compact locked-vault view
+
+DE: Die Ansicht „Tresor gesperrt“ ist jetzt wie die Tresorauswahl auf maximal 500 px Breite begrenzt und mittig ausgerichtet. Der doppelte Sperrhinweis wurde entfernt; die beiden Aktionen stehen untereinander in voller Breite. Die Entsperrlogik bleibt unverändert.
+
+EN: The locked-vault screen now matches the vault selector’s centered 500 px maximum width. The redundant locked message was removed, and the two actions are stacked at full width. Unlock behavior is unchanged.
+
+
+### Verdeckte Master-Passwortabfragen / Masked master-password prompts
+DE: Beim Importieren, Synchronisieren und Prüfen einer .enc-Datei erscheint anstelle des Browser-`prompt()` ein eigener Dialog. Das Passwort ist standardmäßig verdeckt, kann mit dem Augen-Symbol angezeigt werden und wird beim Schließen geleert. Die Datei- und Tresorprüfung bleibt unverändert.
+
+EN: Importing, synchronizing and verifying an .enc file now use an in-app password dialog instead of the browser `prompt()`. Passwords are masked by default, can be revealed using the eye button, and are cleared when the dialog closes. File and vault validation remain unchanged.
+
+
+### Einheitliches Passwortfeld im Dialog / Single password field in dialog
+
+DE: Die Master-Passwortdialoge für Import, Synchronisierung und .enc-Prüfung zeigen nur noch einen rechteckigen Feldrahmen. Das innere Eingabefeld hat keinen eigenen Rahmen und keine ovale Darstellung; das Augen-Symbol bleibt rechts innerhalb des gemeinsamen Feldes. Passwortprüfung und Dialogablauf bleiben unverändert.
+
+EN: The master-password dialogs for import, synchronization and .enc verification now display one rectangular field border. The inner input has no separate border or pill styling; the visibility icon remains inside the shared field on the right. Password validation and dialog flow are unchanged.
