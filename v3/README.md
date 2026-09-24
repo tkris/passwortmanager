@@ -133,3 +133,10 @@ EN (fix): The “Change master password” button remains clickable without dire
 DE: Für neue Tresore und beim Ändern des Master-Passworts gilt keine feste Mindestlänge von 12 Zeichen mehr. Ein leeres Passwort ist weiterhin nicht zulässig, und die Wiederholung muss übereinstimmen. Beim Ändern erscheint für Passwörter unter 12 Zeichen ein bestätigbarer Sicherheitshinweis. Kürzere Master-Passwörter können leichter erraten werden.
 
 EN: Creating a vault and changing its master password no longer enforce a 12-character minimum. Empty passwords remain invalid and the confirmation must match. Changing to a password shorter than 12 characters displays a security warning that can be confirmed. Short master passwords may be easier to guess.
+
+
+## Temporäre Benachrichtigungen / Temporary notifications
+
+**DE:** Allgemeine Statusmeldungen werden nicht mehr unter dem Logo angezeigt, sondern als kurzzeitige Benachrichtigungen unten rechts (auf schmalen Bildschirmen unten mittig). Erfolge erscheinen grün für etwa 3 Sekunden, Hinweise neutral für etwa 4 Sekunden und Fehler/Warnungen rot für etwa 7 Sekunden. Meldungen können über × sofort geschlossen werden. Der dauerhafte Speicherstatus im Tresor bleibt unverändert und ist unabhängig von diesen Benachrichtigungen.
+
+**EN:** General messages no longer occupy a line below the logo. They appear as temporary notifications at the bottom right (bottom center on narrow screens). Success messages are green for about 3 seconds, informational messages neutral for about 4 seconds, and errors/warnings red for about 7 seconds. The × button dismisses a message immediately. The persistent vault storage status remains unchanged and independent of notifications.

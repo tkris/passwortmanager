@@ -3,7 +3,24 @@ const $=id=>document.getElementById(id), DB='pm3_emergency_v1';
 let s=null,pending=null,mode='',busy=false,edit=-1,lockedSession=null,locking=false,lastActivity=Date.now(),pendingMaster=null;
 const lockOptions=new Set([0,1,5,10,15,30]);
 let lockMinutes=Number(localStorage.getItem('vault_lock_minutes'));if(!lockOptions.has(lockMinutes))lockMinutes=5;
-function note(t){$('notice').textContent=t;}
+let noticeTimer=null;
+function note(message,kind){
+ const box=$('notice');
+ clearTimeout(noticeTimer);
+ const value=String(message||'');
+ if(!value){box.classList.add('hidden');$('noticeText').textContent='';return;}
+ // Existing calls use note(text); classify clear failures and warnings without changing vault logic.
+ if(!kind){
+   kind=/fehlgeschlagen|fehler|nicht möglich|nicht verfügbar|ungültig|falsch|ACHTUNG|WARNUNG|NICHT gespeichert|Nicht bestätigt:|konnte nicht|fehlt\.|bitte mindestens|bitte ein anderes|nicht automatisch übernommen|nicht bestätigt:|nicht ausgewählt/i.test(value)?'error':
+        /erfolgreich|entsperrt\.|kopiert\.|geprüft\.|übernommen\.|aktiviert\.|deaktiviert\.|erzeugt\.|gesichert\./i.test(value)?'success':'info';
+ }
+ box.className='toast-'+kind;
+ box.setAttribute('role',kind==='error'?'alert':'status');
+ box.setAttribute('aria-live',kind==='error'?'assertive':'polite');
+ $('noticeText').textContent=value;
+ noticeTimer=setTimeout(()=>{box.classList.add('hidden');$('noticeText').textContent='';},kind==='error'?7000:kind==='success'?3000:4000);
+}
+$('noticeClose').onclick=()=>{clearTimeout(noticeTimer);$('notice').classList.add('hidden');$('noticeText').textContent='';};
 function view(id){for(const n of ['home','unlock','vault','locked'])$(n).classList.toggle('hidden',n!==id);}
 function uuid(){return crypto.randomUUID();}
 function parseEntries(v){if(!Array.isArray(v)||!v.every(e=>e&&['url','username','password'].every(k=>typeof e[k]==='string')))throw Error('Ungültiges Tresorformat');return v.map(e=>({...e}));}
