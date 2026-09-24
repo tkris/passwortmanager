@@ -194,3 +194,17 @@ EN: Vault selection, opening, locked and open vault views share the same respons
 DE: Nach Auswahl einer .enc-Datei erscheint die Master-Passwortabfrage direkt unter „.enc-Datei öffnen“ mit Augen-Symbol und Abbrechen. Beim Wechsel zu einem anderen Startseitenformular wird die Eingabe gelöscht. Die Entschlüsselung und Notfall-Wiederherstellung bleiben unverändert.
 
 EN: After selecting an .enc file, the master-password prompt expands directly beneath “Open .enc file”, with a visibility toggle and Cancel. Switching to another home-screen form clears the input. Decryption and emergency recovery behavior remain unchanged.
+
+
+## Kompakte Startseitenformulare / Compact home-screen forms
+
+**DE:** In den aufgeklappten Formularen für „.enc-Datei öffnen“ und „Neuen Tresor anlegen“ entfallen die wiederholten Überschriften „Tresor öffnen“ bzw. „Neuen Tresor anlegen“. Nach der bestehenden Trennlinie beginnt jeweils direkt das Master-Passwortfeld. Die Aktionsbuttons, Passwortprüfung und übrige Darstellung bleiben unverändert.
+
+**EN:** The expanded “Open .enc file” and “Create new vault” forms no longer repeat their respective headings (“Open vault” and “Create new vault”). Each form begins with the master-password field immediately after the existing divider. Action buttons, password validation and the remaining layout are unchanged.
+
+
+## Anwendungsname / Application name
+
+**DE:** Die sichtbare Überschrift und der Browser-Tab heißen jetzt „🔐 Web-Passwortmanager“ bzw. „Web-Passwortmanager“. Die bisherigen Zusätze „3.0“ und „Browser-Testversion“ wurden aus diesen Anzeigen entfernt. Die interne Versionshistorie und die Funktionalität bleiben unverändert.
+
+**EN:** The visible heading and browser tab are now named “🔐 Web-Passwortmanager” and “Web-Passwortmanager”, respectively. The previous “3.0” and “Browser test version” labels have been removed from these displays. Internal version history and functionality are unchanged.
