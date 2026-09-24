@@ -11,7 +11,7 @@
 
 Der **Web Passwort Manager** ist eine browserbasierte Anwendung zum Verwalten verschlüsselter Passwort-Tresore (`.enc`). Ein Tresor kann mehrere Einträge enthalten; die Anwendung bietet Suche, Sortierung, Passwortgenerator, Import und einen Vergleich zweier Tresore. Die Oberfläche orientiert sich am kompakten, dunklen Design der früheren Version 2.0.
 
-> **Wichtig:** Diese Anwendung ist ein Entwicklungsstand und wurde nicht unabhängig sicherheitsgeprüft. Bewahre zusätzliche, extern gesicherte Kopien deiner `.enc`-Dateien auf. Verlasse dich nicht ausschließlich auf die Notfall-Wiederherstellung im Browser.
+> **Wichtig:** Diese Anwendung ist ein Entwicklungsstand und wurde nicht unabhängig sicherheitsgeprüft. Bewahre zusätzliche, extern gesicherte Kopien deiner `.enc`-Dateien auf. Verlasse dich nicht ausschließlich auf die Sitzungswiederherstellung im Browser.
 
 **Tresor schließen:** Bei grünem Status „Gespeichert“ erscheint der neutrale Button „Tresor schließen“. Bei ungespeicherten oder noch nicht bestätigten Änderungen bleibt der rote Button „Ohne Speichern schließen“ mit Sicherheitsabfrage erhalten.
 
@@ -47,9 +47,9 @@ Die App besteht aus statischen Dateien; es ist kein eigener Anwendungsserver vor
 
 Die Prüfung eines Exports bestätigt **nur die ausgewählte Datei**. Sie ersetzt keine ältere Datei an einem anderen Speicherort. Bewahre die bestätigte Datei auf und öffne beim nächsten Mal diese Fassung.
 
-## Notfall-Wiederherstellung
+## Sitzung wiederherstellen
 
-Bei ungespeicherten Änderungen versucht die Anwendung, einen **verschlüsselten Notfall-Zwischenstand** im Browser (IndexedDB) anzulegen. Mehrere Tresore können getrennte Zwischenstände besitzen. Auf der Startseite erscheint die Notfall-Wiederherstellung nur, wenn entsprechende Zwischenstände vorhanden sind. Jeder Zwischenstand hat eine eigene, direkt darunter aufklappbare Master-Passwortabfrage; beim Wechsel wird die vorherige Eingabe geleert. **„Abbrechen“ löscht keinen Zwischenstand.**
+Bei ungespeicherten Änderungen versucht die Anwendung, einen **verschlüsselten verschlüsselter Sitzungszwischenstand** im Browser (IndexedDB) anzulegen. Mehrere Tresore können getrennte Zwischenstände besitzen. Auf der Startseite erscheint die Sitzungswiederherstellung nur, wenn entsprechende Zwischenstände vorhanden sind. Jeder Zwischenstand hat eine eigene, direkt darunter aufklappbare Master-Passwortabfrage; beim Wechsel wird die vorherige Eingabe geleert. **„Abbrechen“ löscht keinen Zwischenstand.**
 
 Ein Zwischenstand wird nur nach erfolgreicher Entschlüsselung und den vorgesehenen Tresor-/Dateistandsprüfungen übernommen. Browserdaten können unabhängig von der App gelöscht werden. Ein Zwischenstand ersetzt deshalb **keine externe Sicherung** und ist nicht gleichbedeutend mit einer bestätigten Speicherung in der `.enc`-Datei.
 
@@ -127,7 +127,7 @@ The app uses static files and does not require a dedicated application server. D
 
 Export verification confirms **only the selected file**. It does not replace an older copy elsewhere. Keep the verified file and open that copy next time.
 
-## Emergency recovery
+## Restore session
 
 When there are unsaved changes, the application attempts to store an **encrypted emergency draft** in the browser (IndexedDB). Multiple vaults can have separate drafts. The home screen displays recovery only when drafts are present. Each draft has its own expandable master-password form directly below it; switching forms clears the previous input. **Cancel does not delete a draft.**
 
@@ -184,3 +184,10 @@ EN: Action buttons sharing a row (particularly “New password” and “Import 
 DE: Kopiersymbole stehen bei jeder Fensterbreite rechts in den Passwortkarten, jeweils auf Höhe des zugehörigen Feldes. Das Auge bleibt direkt beim Passwort.
 
 EN: Copy icons are aligned at the right edge of password cards at all viewport widths, level with their respective fields. The visibility icon stays next to the password.
+
+
+### Bestätigungsdialoge / Confirmation dialogs
+
+DE: Bestätigungen für Löschen, Wiederherstellen, Synchronisieren, Master-Passwortwechsel und Schließen ohne Speichern erscheinen als Dialoge im App-Design. „Sitzung verwerfen“ löscht nur den verschlüsselten Browser-Zwischenstand; bestehende .enc-Dateien bleiben unverändert. Abbrechen und Escape führen keine bestätigte Aktion aus.
+
+EN: Confirmations for deleting, restoring, synchronizing, changing the master password and closing without saving use in-app dialogs. “Discard session” deletes only the encrypted browser draft, not existing .enc files. Cancel and Escape do not confirm an action.
