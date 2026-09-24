@@ -188,3 +188,9 @@ EN: Vault selection, opening, locked and open vault views share the same respons
 **DE:** Nach dem Übernehmen von Einträgen erscheint der Hinweis „Einträge übernommen. Nicht gespeichert“ orange, im selben Orangeton wie der Status oben rechts. Die Import- und Speicherlogik sowie echte Fehlermeldungen bleiben unverändert.
 
 **EN:** After applying imported entries, the “Entries applied. Not saved” notification is orange, matching the save-status badge at the top right. Import and saving behavior and genuine error notifications are unchanged.
+
+
+### Startseite / Home screen
+DE: Nach Auswahl einer .enc-Datei erscheint die Master-Passwortabfrage direkt unter „.enc-Datei öffnen“ mit Augen-Symbol und Abbrechen. Beim Wechsel zu einem anderen Startseitenformular wird die Eingabe gelöscht. Die Entschlüsselung und Notfall-Wiederherstellung bleiben unverändert.
+
+EN: After selecting an .enc file, the master-password prompt expands directly beneath “Open .enc file”, with a visibility toggle and Cancel. Switching to another home-screen form clears the input. Decryption and emergency recovery behavior remain unchanged.
