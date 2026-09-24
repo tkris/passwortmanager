@@ -1,258 +1,159 @@
-# Passwort Manager 3.0 – Browser-Prototyp / Browser prototype
+# 🔐 Web Passwort Manager
 
-## Deutsch
-
-**Erste, separat zu testende Browser-Version. Nicht als produktionsreifer Passwortmanager verwenden.** Die bestehende Version 2.0 wird nicht verändert. `index.html` über HTTPS (z. B. in einem separaten GitHub-Pages-Testzweig) bereitstellen; für lokalen Test einen lokalen HTTP-Server verwenden. `.enc`-Dateien vor Tests extern sichern.
-
-- Nutzt `crypto_neu.js` und kann das bisherige verschlüsselte 2.0-Dateiformat (Array von Einträgen) öffnen. Beim nächsten Export wird ein neues verschlüsseltes 3.0-Nutzdatenformat mit einer dauerhaften Tresor-ID geschrieben. **Vor einem dauerhaften Wechsel Kompatibilität und Rückweg prüfen:** Die 2.0-App kann das neue 3.0-Nutzdatenformat nicht öffnen.
-- Unterstützt mehrere voneinander getrennte, verschlüsselte Notfall-Zwischenstände in IndexedDB, jeweils pro Tresor-ID. Die App bietet keine gemeinsame Entschlüsselung verschiedener Tresore. Browserprofil-Daten können außerhalb der App gelöscht werden; Notfall-Wiederherstellung ist nicht garantiert.
-- Bei unterstütztem `showOpenFilePicker` und beschreibbarem Dateihandle kann die geöffnete Datei direkt geschrieben werden. Vor dem Schreiben wird ein SHA-256-Fingerabdruck des ursprünglichen Dateistands verglichen; nach dem Schreiben wird der Inhalt erneut gelesen und geprüft. Ein erfolgreiches Schreiben wird erst danach als „Gespeichert“ angezeigt. **Dateianbieter können trotzdem eigene Synchronisations- und Konfliktregeln haben; eine atomare Sicherungskopie ist noch nicht implementiert.**
-- Bei fehlendem direkten Dateizugriff bietet die App nur `.enc`-Export an. Das Download-Angebot ist kein Nachweis, dass die Datei abgelegt wurde; der Notfall-Zwischenstand bleibt bestehen.
-- Beim Sperren mit ungespeicherten Änderungen erscheint eine Warnung; „Ohne Speichern schließen“ löscht nach Bestätigung nur den zugehörigen Notfall-Zwischenstand.
-- Beim Wiederöffnen derselben 3.0-Datei kann ein passender Notfall-Zwischenstand angeboten werden. Bei abweichendem Dateistand wird er nicht automatisch übernommen.
-
-**Bewusste Grenzen dieser ersten Version:** Die vollständige 2.0-Oberfläche und ihre Passwortgenerator-Funktion sind noch nicht portiert. Wiederhergestellte Zwischenstände ohne Dateihandle müssen als neue `.enc`-Datei exportiert werden. Für neue Tresore wird ein erster Export angeboten, dessen tatsächliches Ablegen der Browser nicht bestätigen kann. Es gibt noch keine automatisierten Browser- und Sicherheitstests, keine Android-App und keine iOS-App. Bei mehreren gleichzeitig geöffneten Tabs desselben Tresors fehlt noch eine transaktionssichere Konfliktbehandlung für Notfall-Zwischenstände.
-
-## English
-
-**First standalone browser prototype; not production-ready.** Version 2.0 remains unchanged. Host `index.html` over HTTPS in a separate test deployment and back up existing `.enc` files before testing.
-
-The prototype uses the existing `crypto_neu.js` and opens legacy 2.0 encrypted files. New exports contain a version-3 encrypted payload with a persistent vault ID; the old 2.0 app cannot open that new payload. Separate encrypted emergency drafts are stored in IndexedDB per vault ID. A browser supporting writable file handles may write back to the selected file, with a pre-write fingerprint conflict check and post-write readback. Other browsers only offer an export; a download is not proof that the file was safely stored. A successful write clears only that vault's emergency draft. Browser data may be deleted independently of this application.
-
-**Prototype limitations:** Some advanced 2.0 features, atomic file backups, cross-tab draft conflict protection, automated browser/security testing, and native Android/iOS storage adapters remain future work. Recovered drafts without a file handle require export. Do not rely on this prototype as the sole copy of important passwords.
-
-## Oberfläche / Interface (Design-Teststand)
-
-Deutsch: Die Browser-Testversion verwendet jetzt das dunkle, kompakte Layout der 2.0-Version: optionale lokal erzeugte Website-Kürzel, Suche, Sortierung, getrennte Kopiersymbole für Benutzername und Passwort, Passwort-Auge und ein Drei-Punkte-Menü für Bearbeiten/Löschen. Der Editor wird erst auf Anforderung eingeblendet. Ein dezentes Statusfeld unterscheidet bestätigtes Schreiben der `.enc`-Datei vom bloßen Export und von der Notfall-Wiederherstellung. Die bestehende 3.0-Speicherlogik wurde für dieses Layout nicht neu entworfen; die bekannten Prototyp-Grenzen gelten weiter. Die Website-Kürzel sind keine aus dem Internet geladenen Favicons.
-
-English: The browser test build now uses the compact dark 2.0-style layout with optional locally generated site initials, search, sorting, separate username/password copy icons, a password eye toggle, and a three-dot edit/delete menu. The editor opens on demand. A compact status panel distinguishes verified `.enc` writes from exports and emergency recovery. Existing prototype limitations still apply. Site initials are not remotely fetched favicons.
-
+**Sprache wählen / Choose your language:** [🇩🇪 Deutsch](#deutsch) · [🇬🇧 English](#english)
 
 ---
 
-## Aktualisierung / Update: Wiederherstellung und Speicherstatus
+<a id="deutsch"></a>
+# 🇩🇪 Deutsch
 
-**Deutsch:** Beim Öffnen einer `.enc`-Datei wird ein Wiederherstellungsdialog nur angeboten, wenn ein Zwischenstand mit derselben Tresor-ID und demselben Ausgangs-Dateistand vorhanden ist **und** dessen entschlüsselte Einträge vom Dateistand abweichen. Das bloße Öffnen einer älteren 2.0-Datei erzeugt keinen Notfall-Zwischenstand mehr. Ein vorhandener Zwischenstand wird beim Ablehnen nicht gelöscht. Ein abweichender Ausgangs-Dateistand wird nicht automatisch übernommen. Die orange Kennzeichnung **„Nicht gespeichert“** zeigt ungespeicherte Änderungen an; **„Gespeichert“** erscheint erst nach bestätigtem Schreiben und Prüfen der `.enc`-Datei. Bei unverändert geöffneten Dateien steht **„Dateistand geöffnet“**. Die Schaltflächen für direktes Speichern (sofern verfügbar) und Export befinden sich im kompakten Speicherstatus-Bereich. Ein Export ist kein bestätigtes Speichern.
+## Überblick
 
-**English:** Opening an `.enc` file offers recovery only when a draft matches the vault ID and original file fingerprint **and** its decrypted entries differ from the file contents. Opening a legacy 2.0 file no longer creates a draft by itself. Declining recovery leaves an existing draft intact; drafts based on a different file revision are never applied automatically. The orange **“Nicht gespeichert”** badge indicates unsaved changes. **“Gespeichert”** appears only after the `.enc` file has been written and verified; an unchanged opened file displays **“Dateistand geöffnet”**. Direct save (where supported) and export actions are grouped in the compact storage-status panel. Export alone is not a confirmed save.
+Der **Web Passwort Manager** ist eine browserbasierte Anwendung zum Verwalten verschlüsselter Passwort-Tresore (`.enc`). Ein Tresor kann mehrere Einträge enthalten; die Anwendung bietet Suche, Sortierung, Passwortgenerator, Import und einen Vergleich zweier Tresore. Die Oberfläche orientiert sich am kompakten, dunklen Design der früheren Version 2.0.
 
+> **Wichtig:** Diese Anwendung ist ein Entwicklungsstand und wurde nicht unabhängig sicherheitsgeprüft. Bewahre zusätzliche, extern gesicherte Kopien deiner `.enc`-Dateien auf. Verlasse dich nicht ausschließlich auf die Notfall-Wiederherstellung im Browser.
+
+## Starten
+
+1. Die Dateien `index.html`, `app.js` und `crypto_neu.js` **gemeinsam** auf einem HTTPS-Webserver bereitstellen, beispielsweise über GitHub Pages. Für lokale Tests einen lokalen HTTP-Server verwenden.
+2. Die Seite öffnen und entweder eine bestehende `.enc`-Datei auswählen oder einen neuen Tresor erstellen.
+3. Das Master-Passwort eingeben. Passwortfelder sind standardmäßig verdeckt; über das Augen-Symbol kann die Eingabe angezeigt werden.
+4. Bei einem neuen Tresor die angebotene `.enc`-Datei herunterladen und an einem sicheren Ort aufbewahren. Einen Export anschließend über **„.enc prüfen“** bestätigen.
+
+Die App besteht aus statischen Dateien; es ist kein eigener Anwendungsserver vorgesehen. Browserfunktionen für direkten Dateizugriff können je nach Browser und Bereitstellung fehlen.
+
+## Tresor und Einträge
+
+- **Startseite:** „.enc-Datei öffnen“ und „Neuen Tresor anlegen“ zeigen ihre Passwortformulare direkt auf der Startseite an. Jeweils nur ein Startseitenformular ist geöffnet.
+- **Einträge:** Websites/URLs, Benutzernamen und Passwörter hinzufügen, bearbeiten, löschen, suchen und kopieren. Passwörter lassen sich bei Bedarf über das Auge einblenden.
+- **Passwortgenerator:** 8–64 Zeichen (Vorgabe: 20); Klein- und Großbuchstaben, Zahlen und Sonderzeichen können ausgewählt werden.
+- **Sortierung:** Website A–Z/Z–A, „Zuletzt hinzugefügt“ und „Zuletzt geändert“. Bei älteren Einträgen ohne gespeicherte Zeitstempel lässt sich das ursprüngliche Datum nicht nachträglich bestimmen.
+- **Scrollbare Liste:** Die Passwortkarten haben einen eigenen Scrollbereich; Suche, Sortierung, Aktionen und Speicherstatus bleiben außerhalb der Liste. Die maximale Listenhöhe beträgt 420 px, auf schmalen Bildschirmen 440 px. Abweichende Kartenhöhen können früheres Scrollen erfordern.
+
+## Speichern, Exportieren und Prüfen
+
+**Die `.enc`-Datei ist der maßgebliche gespeicherte Tresor.** Änderungen im geöffneten Tresor sind nicht automatisch dauerhaft in dieser Datei gespeichert.
+
+| Anzeige / Aktion | Bedeutung |
+| --- | --- |
+| **Nicht gespeichert** (orange) | Änderungen sind noch nicht bestätigt in einer `.enc`-Datei gesichert. |
+| **Datei speichern** | Bei unterstütztem, beschreibbarem Dateizugriff wird die geöffnete Datei geschrieben und danach erneut gelesen und geprüft. |
+| **.enc exportieren** | Bietet eine verschlüsselte Datei zum Download an; der Download allein bestätigt kein erfolgreiches Ablegen. |
+| **Nicht bestätigt** (orange) | Ein exportierter Stand wartet noch auf Prüfung. |
+| **.enc prüfen** | Die tatsächlich gespeicherte/heruntergeladene Datei auswählen und mit dem passenden Master-Passwort prüfen. Tresor-ID und Einträge müssen zum aktuellen Stand passen. |
+| **Gespeichert** (grün) | Der aktuelle Stand wurde durch direktes Schreiben mit Prüfung oder durch erfolgreiche Prüfung der ausgewählten Exportdatei bestätigt. |
+
+Die Prüfung eines Exports bestätigt **nur die ausgewählte Datei**. Sie ersetzt keine ältere Datei an einem anderen Speicherort. Bewahre die bestätigte Datei auf und öffne beim nächsten Mal diese Fassung.
+
+## Notfall-Wiederherstellung
+
+Bei ungespeicherten Änderungen versucht die Anwendung, einen **verschlüsselten Notfall-Zwischenstand** im Browser (IndexedDB) anzulegen. Mehrere Tresore können getrennte Zwischenstände besitzen. Auf der Startseite erscheint die Notfall-Wiederherstellung nur, wenn entsprechende Zwischenstände vorhanden sind. Jeder Zwischenstand hat eine eigene, direkt darunter aufklappbare Master-Passwortabfrage; beim Wechsel wird die vorherige Eingabe geleert. **„Abbrechen“ löscht keinen Zwischenstand.**
+
+Ein Zwischenstand wird nur nach erfolgreicher Entschlüsselung und den vorgesehenen Tresor-/Dateistandsprüfungen übernommen. Browserdaten können unabhängig von der App gelöscht werden. Ein Zwischenstand ersetzt deshalb **keine externe Sicherung** und ist nicht gleichbedeutend mit einer bestätigten Speicherung in der `.enc`-Datei.
+
+## Import und Tresorvergleich
+
+Über **„Einträge aus Tresor importieren“** oder **„Tresore synchronisieren (Diff)“** eine zweite `.enc`-Datei auswählen und mit deren Master-Passwort entschlüsseln. Die angezeigten neuen bzw. abweichenden Einträge einzeln oder über **„Alle übernehmen“** auswählen. Die zweite Datei wird dabei nur gelesen; es findet **keine automatische bidirektionale Synchronisation** und keine automatische Übernahme von Löschungen statt. Übernommene Änderungen im geöffneten Tresor müssen anschließend gespeichert oder exportiert **und geprüft** werden. Die entsprechende Benachrichtigung ist orange, weil die Übernahme gelungen, aber noch nicht gespeichert ist.
+
+## Sperre, Einstellungen und Master-Passwort
+
+- **Automatische Sperre:** Nach 1, 5, 10, 15 oder 30 Minuten Inaktivität; standardmäßig 5 Minuten. „Niemals sperren“ ist ebenfalls wählbar. Nach dem Sperren kann der Tresor auf derselben Seite mit dem Master-Passwort entsperrt werden. Ein Neuladen oder Schließen beendet diese Sitzung.
+- **Einstellungen:** Website-Kürzel ein-/ausblenden, Sperrzeit einstellen und Master-Passwort ändern.
+- **Master-Passwort ändern:** Bisheriges Passwort eingeben, neues Passwort zweimal eingeben. Ein leeres neues Passwort ist nicht erlaubt; bei kurzen Passwörtern erscheint ein Sicherheitshinweis. Bei direktem Schreibzugriff wird die Datei geschrieben und geprüft; andernfalls muss die neu exportierte `.enc`-Datei mit dem **neuen** Master-Passwort über „.enc prüfen“ bestätigt werden. Die ursprüngliche Datei bleibt bis dahin erhalten. Vorher eine externe Sicherungskopie erstellen.
+- **Passwortdialoge:** Master-Passwörter beim Import, Vergleich und bei der `.enc`-Prüfung werden in eigenen Dialogen standardmäßig verdeckt eingegeben. Das Auge schaltet die Sichtbarkeit um; beim Schließen wird die Eingabe geleert.
+
+## Hinweise und Grenzen
+
+- Die ältere **Version 2.0 bleibt ein separates Projekt**. Bestehende 2.0-Dateien können geöffnet werden; ein neu exportiertes Tresorformat mit Tresor-ID ist jedoch nicht automatisch mit der alten 2.0-Anwendung kompatibel. Vor dem Umstieg Sicherung und Rückweg prüfen.
+- Direkter Dateizugriff ist browserabhängig. Ein Export und seine anschließende Prüfung bestätigen die ausgewählte Datei, nicht die Synchronisation durch einen externen Cloud-Anbieter.
+- Die Anwendung bietet keine garantierte Wiederherstellung bei gelöschten Browserdaten, beschädigten Dateien oder verlorenem Master-Passwort.
+- Es liegen keine vollständigen automatisierten Browser- oder unabhängigen Sicherheitstests vor. Mehrere gleichzeitig geöffnete Tabs desselben Tresors können Konflikte verursachen.
+
+## Projektdateien
+
+| Datei | Zweck |
+| --- | --- |
+| `index.html` | Oberfläche und Gestaltung |
+| `app.js` | Tresor-, Datei- und Bedienlogik |
+| `crypto_neu.js` | Verschlüsselungs-/Entschlüsselungsfunktionen |
+| `README.md` | Diese Anleitung |
+
+[↑ Zur Sprachauswahl](#-web-passwort-manager)
 
 ---
 
-## Import & Synchronisation mit Diff (Deutsch)
+<a id="english"></a>
+# 🇬🇧 English
 
-- **Einträge aus Tresor importieren:** Im geöffneten Tresor die zweite `.enc`-Datei wählen und mit deren Master-Passwort entschlüsseln. Die scrollbare Liste zeigt neue und abweichende Einträge. Einzelne Einträge markieren oder **„Alle übernehmen“** wählen; **„Auswahl aufheben“** setzt die Auswahl zurück.
-- **Tresore synchronisieren (Diff):** Zeigt die Unterschiede zum zweiten Tresor nach Website/URL und Benutzername. Bei Abweichungen ersetzt die ausgewählte Fassung aus der zweiten Datei den entsprechenden Eintrag im geöffneten Tresor. Nicht ausgewählte Einträge bleiben unverändert. Unveränderte Einträge werden nicht angezeigt.
-- Die zweite Datei wird **nur gelesen, niemals verändert**. Es erfolgt **keine automatische bidirektionale Synchronisation** und keine automatische Übernahme von Löschungen. Unterschiedliche Website-/Benutzernamen-Kombinationen gelten als separate Einträge; identische Kombinationen werden verglichen. Prüfe die Auswahl, insbesondere bei doppelten Einträgen.
-- Übernommene Einträge gelten als **nicht gespeichert** und werden nach Möglichkeit im verschlüsselten Notfall-Zwischenstand gesichert. Erst das erfolgreiche direkte Schreiben und Prüfen der geöffneten `.enc`-Datei bestätigt „Gespeichert“. Ein Export allein bestätigt dies nicht.
-- **Sicherheit:** Das Master-Passwort der zweiten Datei wird nur für den aktuellen Vergleich abgefragt; die entschlüsselten Einträge werden nicht als zusätzlicher Browser-Zwischenstand gespeichert. Vergleiche und importiere nur Dateien, deren Herkunft du vertraust.
+## Overview
 
-## Import & diff synchronization (English)
+**Web Passwort Manager** is a browser-based application for managing encrypted password vaults (`.enc`). A vault can contain multiple entries; the application provides search, sorting, a password generator, importing, and comparison between two vaults. Its compact dark interface follows the earlier version 2.0 design.
 
-- **Import entries from vault:** Select a second `.enc` file and unlock it with its master password. The scrollable list shows new and differing entries. Select individual entries or use **“Alle übernehmen” (Select all)**; **“Auswahl aufheben”** clears the selection.
-- **Synchronize vaults (Diff):** Compare entries by website/URL and username. Selecting a differing entry replaces the corresponding entry in the currently open vault with the second file's version. Unselected entries remain unchanged; identical entries are omitted.
-- The second file is **read-only**. This is **not automatic two-way synchronization** and deletions are not propagated. Different website/username combinations are treated as separate entries; review duplicates carefully.
-- Applied changes are **unsaved** until the open `.enc` file is successfully written and verified. An encrypted emergency draft is attempted; exporting alone does not confirm a save. The second file's master password and decrypted contents are not stored as a separate emergency draft.
+> **Important:** This is a development build and has not undergone an independent security audit. Keep additional external backups of your `.enc` files. Do not rely on browser emergency recovery as your only backup.
 
+## Getting started
 
-## Automatische Sperre / Automatic lock (3.0)
+1. Serve `index.html`, `app.js`, and `crypto_neu.js` **together** over HTTPS, for example using GitHub Pages. Use a local HTTP server for local testing.
+2. Open the page and select an existing `.enc` file or create a new vault.
+3. Enter the master password. Password fields are masked by default; use the eye icon to reveal the input when needed.
+4. For a new vault, download the offered `.enc` file and keep it somewhere safe. Confirm an export using **“.enc prüfen” (Verify .enc)**.
 
-**Deutsch:** Unter „⚙️ Einstellungen“ im geöffneten Tresor lässt sich die automatische Sperre nach 1, 5, 10, 15 oder 30 Minuten Inaktivität einstellen oder mit „Niemals sperren“ deaktivieren (Standard: 5 Minuten). Die Auswahl bleibt in diesem Browser gespeichert. Nach einer manuellen oder automatischen Sperre kann der Tresor in derselben geöffneten Seite mit dem Master-Passwort wieder entsperrt werden, ohne die `.enc`-Datei erneut auszuwählen. Die App verwirft dabei die entschlüsselten Einträge und den Sitzungsschlüssel; nur ein verschlüsselter Sitzungsschnappschuss bleibt bis zum Entsperren oder Verlassen der Sperrseite im Arbeitsspeicher. Bei ungespeicherten Änderungen muss zuvor ein verschlüsselter Notfall-Zwischenstand erfolgreich im Browser gespeichert werden, andernfalls wird die Sperre nicht durchgeführt. Eine Sperre schreibt **nicht** in die `.enc`-Datei. Beim Schließen oder Neuladen der Seite ist die Entsperr-Sitzung weg; öffne dann die Datei erneut oder nutze bei ungespeicherten Änderungen die Notfall-Wiederherstellung. Die automatische Sperre ist kein Schutz gegen bereits kompromittierte Browser-Erweiterungen oder Geräte.
+The app uses static files and does not require a dedicated application server. Direct file access may be unavailable in some browsers or deployment environments.
 
-**English:** In the open vault, use “⚙️ Einstellungen” to choose automatic locking after 1, 5, 10, 15 or 30 minutes of inactivity, or disable it with “Niemals sperren” (default: 5 minutes). The preference is saved in this browser. After manual or automatic locking, unlock the vault on the same open page with its master password without selecting the `.enc` file again. Decrypted entries and the session key are discarded; only an encrypted session snapshot remains in memory until unlocking or leaving the lock screen. If changes are unsaved, an encrypted emergency draft must be stored successfully before locking; otherwise locking is cancelled. Locking does **not** write the `.enc` file. Reloading or closing the page discards the unlock session; reopen the file or use emergency recovery for unsaved changes. Automatic locking cannot protect against a compromised device or browser extensions.
+## Vaults and entries
 
-### Layout und Master-Passwort (aktuelle Testversion)
+- **Home screen:** Opening an `.enc` file and creating a vault display their password forms inline on the home screen. Only one home-screen form is open at a time.
+- **Entries:** Add, edit, delete, search, and copy websites/URLs, usernames, and passwords. The eye icon can reveal a password when needed.
+- **Password generator:** 8–64 characters (default: 20); choose lowercase and uppercase letters, digits, and special characters.
+- **Sorting:** Website A–Z/Z–A, Recently added, and Recently changed. Original timestamps cannot be reconstructed for older entries that lack them.
+- **Scrollable list:** Password cards scroll independently; search, sorting, actions, and save status stay outside the list. Maximum list height is 420 px, or 440 px on narrow screens. Taller cards may require scrolling sooner.
 
-- Die Tresorüberschrift zeigt die Eintragszahl; die orange Plakette „Nicht gespeichert“ erscheint nur bei ungespeicherten Änderungen. Der Speicherstatus ist einmalig und kompakt, die Export- und Speicherbuttons haben dieselbe Größe wie andere Aktionen.
-- „Einstellungen“ ist zunächst eingeklappt. Darin befinden sich „Symbole anzeigen“, die automatische Sperre und „Master-Passwort ändern“.
-- Der Master-Passwort-Wechsel ist **nur bei direktem, beschreibbarem Dateizugriff** möglich. Vorheriges Passwort wird geprüft, das neue darf nicht leer sein und muss zweimal identisch sein; bei weniger als 12 Zeichen erscheint ein bestätigbarer Sicherheitshinweis. Die Datei wird erst nach Verschlüsselungsprüfung und ausdrücklicher Bestätigung überschrieben und danach erneut gelesen und geprüft. Ohne Dateihandle bleibt die Aktion deaktiviert; ein Download gilt nicht als bestätigter Passwortwechsel.
-- **Vor einem Master-Passwort-Wechsel unbedingt eine externe Sicherungskopie anlegen.** Bei einem Fehler während des Schreibens ist der Dateistand möglicherweise unklar; in diesem Fall die Datei nicht blind erneut überschreiben. Der Passwortwechsel betrifft ausschließlich den aktuell geöffneten Tresor, nicht andere Tresore oder deren Notfall-Zwischenstände.
+## Saving, exporting, and verifying
 
-### Layout and master password (current test version)
+**The `.enc` file is the authoritative saved vault.** Changes in an open vault are not automatically saved permanently to that file.
 
-- The vault heading shows the entry count; the orange “Not saved” badge appears only for unsaved changes. Storage status is shown once in a compact panel with consistent action-button sizing.
-- Settings are collapsed by default and contain icon visibility, automatic locking and the master-password change action.
-- Changing the master password requires **direct writable file access**. The current password is checked, the new password must not be empty and must match its confirmation; passwords shorter than 12 characters trigger a confirmable security warning. The replacement ciphertext is verified before the user confirms the write; the written file is read back and checked. The action is disabled without a writable file handle; an export alone cannot confirm a password change.
-- **Create an external backup before changing the master password.** A write failure can leave the file in an uncertain state; do not overwrite it blindly. The change affects only the currently opened vault, not other vaults or their emergency drafts.
+| Status / action | Meaning |
+| --- | --- |
+| **Nicht gespeichert** (Not saved; orange) | Changes have not yet been confirmed in an `.enc` file. |
+| **Datei speichern** (Save file) | Where writable file access is supported, writes the open file and reads it back for verification. |
+| **.enc exportieren** (Export .enc) | Offers an encrypted download; the download alone does not prove that the file was saved. |
+| **Nicht bestätigt** (Not confirmed; orange) | An exported version is awaiting verification. |
+| **.enc prüfen** (Verify .enc) | Select the actual downloaded/saved file and enter its master password. Vault ID and entries must match the current vault. |
+| **Gespeichert** (Saved; green) | The current state has been confirmed by a verified direct write or successful verification of the selected export. |
 
+Export verification confirms **only the selected file**. It does not replace an older copy elsewhere. Keep the verified file and open that copy next time.
 
-## Exportprüfung / Export verification (3.0)
+## Emergency recovery
 
-**Deutsch:** Nach einem Export mit ungespeicherten Änderungen zeigt die orange Plakette „Nicht bestätigt“. Neben „.enc exportieren“ erscheint „.enc prüfen“. Wähle die tatsächlich heruntergeladene `.enc`-Datei und gib das Master-Passwort ein. Die App entschlüsselt die ausgewählte Datei und vergleicht Tresor-ID und sämtliche Einträge mit dem aktuellen Stand. Nur bei vollständiger Übereinstimmung erscheint die grüne Plakette „Gespeichert“ und der zugehörige Notfall-Zwischenstand wird entfernt. Bei falscher Datei, falschem Passwort oder Änderungen seit dem Export bleibt der Stand unbestätigt; erneut exportieren und prüfen. Die Prüfung bestätigt **nur die ausgewählte Datei**, nicht das Ersetzen einer älteren Datei an einem anderen Speicherort. Nach erfolgreicher Exportprüfung wird eine eventuell zuvor geöffnete direkte Dateiverknüpfung getrennt, damit die ältere Datei nicht versehentlich überschrieben wird. Für das nächste Öffnen die geprüfte Datei auswählen.
+When there are unsaved changes, the application attempts to store an **encrypted emergency draft** in the browser (IndexedDB). Multiple vaults can have separate drafts. The home screen displays recovery only when drafts are present. Each draft has its own expandable master-password form directly below it; switching forms clears the previous input. **Cancel does not delete a draft.**
 
-**English:** Exporting a vault with unsaved changes shows the orange “Nicht bestätigt” (Not confirmed) badge and a “.enc prüfen” (Verify .enc) button next to Export. Select the downloaded file and enter its master password. The app decrypts the selected file and compares its vault ID and all entries with the current vault. Only an exact match shows the green “Gespeichert” (Saved) badge and removes the corresponding emergency draft. A wrong file, incorrect password or later edits leave the export unconfirmed; export and verify again. Verification confirms **the selected file only**; it does not replace an older file elsewhere. After verification, any previously opened direct file handle is detached to prevent overwriting an older copy. Open the verified file next time.
+A draft is applied only after successful decryption and the relevant vault/file-state checks. Browser data can be deleted independently of the app. Emergency drafts are **not external backups** and do not mean that the `.enc` file has been saved.
 
-## Passwortgenerator und Dateiprüfung / Password generator and file verification
+## Importing and comparing vaults
 
-**DE:** Beim Erstellen und Bearbeiten eines Eintrags kann das Passwort mit dem Auge angezeigt oder verborgen werden. Der Generator erstellt Passwörter mit 8–64 Zeichen (Vorgabe: 20). Kleinbuchstaben, Großbuchstaben, Zahlen und Sonderzeichen lassen sich einzeln wählen; jede aktivierte Gruppe kommt mindestens einmal vor. Die Erzeugung nutzt `crypto.getRandomValues()` und ersetzt den aktuellen Inhalt des Passwortfelds. Erst das Übernehmen des Eintrags ändert den Tresor. „.enc prüfen“ ist dauerhaft sichtbar: Die ausgewählte Datei muss zur Tresor-ID passen und exakt die aktuellen Einträge enthalten. Eine erfolgreiche Prüfung bestätigt ausschließlich die ausgewählte Datei, nicht das Ersetzen einer anderen Datei.
+Use **“Einträge aus Tresor importieren” (Import entries from vault)** or **“Tresore synchronisieren (Diff)” (Compare vaults)** to select a second `.enc` file and decrypt it using its master password. Select individual new or differing entries, or choose **“Alle übernehmen” (Select all)**. The second file is read-only: there is **no automatic two-way synchronization** and deletions are not propagated automatically. Applied changes to the open vault must subsequently be saved or exported **and verified**. The import notification is orange because applying entries succeeded but saving is still pending.
 
-**EN:** When creating or editing an entry, the eye button shows or hides the password. The generator creates passwords of 8–64 characters (default: 20). Lowercase, uppercase, digits and special characters can be selected individually; every selected group appears at least once. Generation uses `crypto.getRandomValues()` and replaces the current password field. The vault changes only when the entry is applied. “Verify .enc” remains visible at all times: the selected file must match the vault ID and contain exactly the current entries. Successful verification confirms only the selected file, not replacement of any other file.
+## Locking, settings, and master password
 
+- **Automatic lock:** After 1, 5, 10, 15, or 30 minutes of inactivity; default is 5 minutes. “Never lock” is also available. Unlock on the same page with the master password. Reloading or closing the page ends that session.
+- **Settings:** Toggle website initials, choose the lock interval, and change the master password.
+- **Change master password:** Enter the current password and the new password twice. An empty new password is not allowed; short passwords trigger a security warning. With direct writable file access, the file is written and verified; otherwise the newly exported `.enc` file must be confirmed with the **new** master password via “.enc prüfen”. The original file remains in place until then. Make an external backup first.
+- **Password dialogs:** Master-password prompts for import, comparison, and `.enc` verification use in-app dialogs with masked input by default. The eye icon toggles visibility, and closing the dialog clears its input.
 
-## Optische Anpassung / Visual refinement (3.0)
+## Notes and limitations
 
-**Deutsch:** „Symbole anzeigen“ ist im eingeklappten Einstellungsbereich als vollbreite Zeile mit einem Schalter rechts gestaltet; die bestehende Funktion zum Ein- und Ausblenden der Website-Kürzel bleibt erhalten. Der Button „Passwort generieren“ verwendet nun die gleiche sekundäre Button-Gestaltung (Farbe, Höhe, Ecken und Schrift) wie Import und Diff. Suchfeld und Texteingaben im Formular „Neues Passwort“ nutzen dieselbe Hintergrund- und Rahmenfarbe. Der äußere Formularbereich bleibt zur optischen Trennung etwas dunkler. Die Verschlüsselungs-, Export- und Prüfregeln wurden nicht verändert.
+- The older **version 2.0 remains a separate project**. Existing 2.0 files can be opened, but a newly exported vault format with a vault ID is not automatically compatible with the old 2.0 app. Back up files and verify your rollback path before migrating.
+- Direct file access depends on the browser. Export verification confirms the selected file, not synchronization performed by an external cloud provider.
+- Recovery is not guaranteed if browser data is cleared, files are damaged, or the master password is lost.
+- Full automated browser testing and independent security auditing have not been completed. Opening the same vault in multiple tabs may lead to conflicts.
 
-**English:** “Show icons” now appears as a full-width settings row with a switch on the right; the existing site-initials visibility behavior is unchanged. The “Generate password” button now shares the secondary action styling (color, height, corners and typography) used by Import and Diff. The search field and text inputs in the “New password” editor use the same background and border colors. The surrounding editor panel remains slightly darker for visual separation. Encryption, export and verification behavior is unchanged.
+## Project files
 
+| File | Purpose |
+| --- | --- |
+| `index.html` | Interface and styling |
+| `app.js` | Vault, file, and interaction logic |
+| `crypto_neu.js` | Encryption/decryption functions |
+| `README.md` | This guide |
 
-## Formularanpassung / Entry form update
-
-**DE:** Beim Anlegen und Bearbeiten eines Eintrags werden nur noch „Website / URL“, „Benutzername / E-Mail“ und „Passwort“ angezeigt. Das Auge zum Anzeigen des Passworts befindet sich innerhalb des Passwortfelds. Der Generator bleibt darunter. Die eingegebene Website wird in den vorhandenen Datenfeldern `title` und `url` abgelegt; beim Bearbeiten eines älteren Eintrags mit unterschiedlicher Bezeichnung und URL wird die Bezeichnung durch den eingegebenen Website-/URL-Wert ersetzt. Die Verschlüsselung und das Tresorformat wurden nicht geändert. Die Kompatibilität mit Version 2.0 ist dadurch nicht hergestellt.
-
-**EN:** Creating and editing an entry now shows only “Website / URL”, “Username / email”, and “Password”. The visibility button sits inside the password field; the generator remains below. The website value is stored in the existing `title` and `url` fields. Editing an older entry with a separate title and URL replaces its title with the entered website/URL value. Encryption and the vault format are unchanged; this does not add compatibility with version 2.0.
-
-
-### Formular und Master-Passwort / Entry form and master password
-
-DE: Das Augensymbol sitzt ohne sichtbaren Button-Hintergrund im Passwortfeld beim Erstellen und Bearbeiten. Unter Einstellungen öffnet „Master-Passwort ändern“ ein aufklappbares Formular mit drei Passwortfeldern und jeweils eigener Sichtbarkeitsfunktion; „Abbrechen“ verwirft die Eingaben. Ohne direkten Schreibzugriff wird das Formular angezeigt, aber die Änderung kann nicht abgeschlossen werden; es erscheint eine erklärende Meldung. Eine bestätigte Passwortänderung setzt weiterhin das Schreiben und Prüfen der .enc-Datei voraus.
-
-EN: The eye icon appears inside the password field without a separate visible button background in create/edit forms. Under Settings, “Change master password” expands a form with three password fields, each with its own visibility toggle; Cancel clears the inputs. Without direct file-write access, the form opens but the change cannot be completed and an explanation is displayed. A confirmed password change still requires writing and verifying the .enc file.
-
-
-### Sichtbarkeitssymbol korrigiert / Visibility icon fix
-
-**DE:** Das Auge im Passwortfeld für neue und bearbeitete Einträge wird nun als SVG mit sichtbarer Pupille dargestellt (statt als Kreis). Beim Einblenden wechselt es zum durchgestrichenen Auge; die Master-Passwortfelder behalten dieselbe Symbolfamilie. Die Änderung betrifft nur die Anzeige, nicht die Verschlüsselung oder das Tresorformat.
-
-**EN:** The eye in the create/edit password field is now rendered as an SVG with a visible pupil (rather than a circle). When the password is shown, the icon changes to an eye with a slash; master-password fields use the same icon family. This is a display-only change and does not alter encryption or the vault format.
-
-
-DE (Korrektur): Der Button „Master-Passwort ändern“ bleibt auch ohne direkten Dateizugriff anklickbar und öffnet das Formular. Erst das Abschließen erfordert einen beschreibbaren Dateihandle; andernfalls erscheint eine Erklärung.
-
-EN (fix): The “Change master password” button remains clickable without direct file access and opens the form. Completing the change requires a writable file handle; otherwise an explanation is shown.
-
-
-## Master-Passwort ändern ohne direkten Dateizugriff / Change master password without direct file access
-
-**DE:** Unter Einstellungen → Master-Passwort ändern das bisherige und zweimal das neue Master-Passwort eingeben. Bei direktem Dateizugriff wird die geöffnete Datei wie bisher geschrieben und geprüft. Ohne direkten Dateizugriff bietet die App stattdessen eine mit dem neuen Passwort verschlüsselte `.enc`-Datei zum Download an. Der Status bleibt orange „Nicht bestätigt“; die alte Datei wird nicht überschrieben. Die heruntergeladene Datei mit „.enc prüfen“ auswählen und das **neue** Master-Passwort eingeben. Die App vergleicht die exakten exportierten Dateibytes und den Tresorinhalt. Erst bei erfolgreicher Prüfung wechselt der Sitzungs-Schlüssel zum neuen Passwort, der Status wird grün „Gespeichert“ und der alte Notfall-Zwischenstand wird entfernt. Vorher gilt in der laufenden Sitzung weiterhin das bisherige Passwort. Die neue Datei beim nächsten Öffnen verwenden; die alte Datei erst nach erfolgreicher Prüfung selbst ersetzen oder sicher aufbewahren. Sperren, Änderungen am Tresor oder ein erneuter Master-Passwortwechsel vor der Prüfung verwerfen die ausstehende Umstellung; gegebenenfalls erneut exportieren. Falls der Download abgebrochen wurde oder die Prüfung scheitert, bleibt die alte Datei unverändert. Bitte zuerst ausschließlich mit Testtresoren ausprobieren.
-
-**EN:** In Settings → Change master password, enter the current password and the new password twice. With direct file access the app writes and verifies the opened file as before. Without direct access, it offers a newly encrypted `.enc` download; the old file is not overwritten and the status stays orange “Not confirmed”. Select the downloaded file via “Verify .enc” and enter the **new** master password. The app checks the exact exported file bytes and vault contents. Only successful verification switches the in-memory session key to the new password, shows green “Saved”, and removes the old emergency draft. Until then, the current session still uses the old password. Open the verified new file next time; only replace the old file yourself after verification. Locking, editing, or starting another password change before verification cancels the pending rotation; export again if needed. Test with disposable vaults first.
-
-### Master-Passwort-Länge / Master password length
-
-DE: Für neue Tresore und beim Ändern des Master-Passworts gilt keine feste Mindestlänge von 12 Zeichen mehr. Ein leeres Passwort ist weiterhin nicht zulässig, und die Wiederholung muss übereinstimmen. Beim Ändern erscheint für Passwörter unter 12 Zeichen ein bestätigbarer Sicherheitshinweis. Kürzere Master-Passwörter können leichter erraten werden.
-
-EN: Creating a vault and changing its master password no longer enforce a 12-character minimum. Empty passwords remain invalid and the confirmation must match. Changing to a password shorter than 12 characters displays a security warning that can be confirmed. Short master passwords may be easier to guess.
-
-
-## Temporäre Benachrichtigungen / Temporary notifications
-
-**DE:** Allgemeine Statusmeldungen werden nicht mehr unter dem Logo angezeigt, sondern als kurzzeitige Benachrichtigungen unten rechts (auf schmalen Bildschirmen unten mittig). Erfolge erscheinen grün für etwa 3 Sekunden, Hinweise neutral für etwa 4 Sekunden und Fehler/Warnungen rot für etwa 7 Sekunden. Meldungen können über × sofort geschlossen werden. Der dauerhafte Speicherstatus im Tresor bleibt unverändert und ist unabhängig von diesen Benachrichtigungen.
-
-**EN:** General messages no longer occupy a line below the logo. They appear as temporary notifications at the bottom right (bottom center on narrow screens). Success messages are green for about 3 seconds, informational messages neutral for about 4 seconds, and errors/warnings red for about 7 seconds. The × button dismisses a message immediately. The persistent vault storage status remains unchanged and independent of notifications.
-
-
-## Einheitliche Ansichten und Passwortfelder / Unified views and password fields
-
-DE: Tresorauswahl, Tresor öffnen, gesperrter Tresor und geöffneter Tresor verwenden dieselbe responsive Fensterbreite. Die Master-Passwortfelder zum Öffnen, Anlegen und Entsperren besitzen nun ebenso wie die Passwortfelder im Eintragsformular und bei der Master-Passwortänderung ein Auge innerhalb des Felds. Beim Aufrufen sind Passwörter verborgen. Beim Generieren eines Eintragspassworts wird das neu erzeugte Passwort ausnahmsweise sofort angezeigt; über das Auge kann es wieder verborgen werden. Die Tresor- und Speicherlogik bleibt unverändert.
-
-EN: Vault selection, opening, locked and open vault views share the same responsive panel width. Master password inputs for opening, creating and unlocking a vault now have an in-field visibility toggle, like entry and master password change inputs. Passwords start hidden. Generating an entry password automatically reveals the new password; the eye control can hide it again. Vault and storage logic remain unchanged.
-
-
-## Kompakte Startseite / Compact home screen
-
-**DE:** Die Tresorauswahl ist wieder ein schmales, mittig ausgerichtetes Fenster im bestehenden 3.0-Design. Die Buttons „.enc-Datei öffnen“ und „Neuen Tresor anlegen“ stehen gleich breit untereinander. Die Notfall-Wiederherstellung erscheint nur, wenn im Browser strukturell verwendbare verschlüsselte Zwischenstände vorliegen; sie ist durch eine Linie von den Hauptaktionen getrennt. Ob ein Zwischenstand mit dem Master-Passwort entschlüsselt werden kann und zu einem geöffneten Tresor passt, wird weiterhin beim Öffnen geprüft. Ohne Zwischenstände wird auch keine Leerstandsmeldung angezeigt. Die Ansichten des geöffneten und gesperrten Tresors bleiben unverändert.
-
-**EN:** Vault selection is a narrow, centered panel using the existing 3.0 theme. The Open .enc and Create vault buttons are equally wide and stacked. Emergency recovery is separated from the main actions and shown only when structurally usable encrypted drafts exist in the browser. Decryption and vault matching are still checked when opening a draft or vault. No empty-state recovery message is shown. Open and locked vault views are unchanged.
-
-
-## Aufklappbares Tresorformular / Expandable vault creation form
-
-**DE:** „Neuen Tresor anlegen“ öffnet die beiden Master-Passwortfelder direkt unter den Hauptbuttons auf der kompakten Startseite, abgetrennt durch dieselbe Linie wie die Notfall-Wiederherstellung. Erneutes Klicken oder „Abbrechen“ klappt das Formular zu und leert die Eingaben. Wenn Notfall-Zwischenstände vorhanden sind, bleiben sie darunter in einem eigenen, ebenfalls abgetrennten Bereich sichtbar. Beim Erstellen wird weiterhin eine neue Tresor-ID vergeben; bestehende Zwischenstände anderer Tresore werden nicht gelöscht. Öffnen einer .enc-Datei und Wiederherstellen verwenden weiterhin die eigene Entsperransicht.
-
-**EN:** “Create vault” expands the two master-password fields below the main buttons on the compact home screen, using the same divider as emergency recovery. Clicking it again or choosing Cancel collapses the form and clears its inputs. When recovery drafts exist, they remain visible below in their own separately divided area. Creating a vault still assigns a new vault ID and does not delete other vaults’ drafts. Opening an .enc file and restoring a draft retain their separate unlock screen.
-
-
-## Notfall-Passwort direkt auf der Startseite / Inline recovery password
-
-**DE:** „Wiederherstellen“ klappt die Master-Passwortabfrage direkt unter dem ausgewählten Notfall-Zwischenstand auf, mit Passwort-Auge, „Wiederherstellen“ und „Abbrechen“. Es wird keine separate Entsperransicht für diese Aktion geöffnet. Das Öffnen eines anderen Zwischenstands oder des Formulars „Neuen Tresor anlegen“ schließt die vorherige Abfrage und leert deren Passwortfeld. Ein Abbruch löscht keinen Zwischenstand. Entschlüsselung, Tresor-ID-Prüfung und Speicherstatus bleiben unverändert. Die Entsperransicht für das Öffnen einer `.enc`-Datei bleibt bestehen.
-
-**EN:** “Restore” expands the master-password prompt immediately beneath the selected emergency draft, with a password visibility toggle and Restore/Cancel actions. Recovery no longer navigates to a separate unlock screen. Opening another draft or the Create vault form closes the previous prompt and clears its password. Cancelling does not delete any draft. Decryption, vault ID verification, and save-status rules are unchanged. Opening an `.enc` file still uses its existing unlock screen.
-
-
-## Mehrere Zwischenstände / Multiple recovery drafts
-
-**DE:** Jeder Zwischenstand hat eine eigene, unmittelbar unter seinen Aktionsbuttons angeordnete aufklappbare Passwortabfrage. Beim Wechsel zu einem anderen Zwischenstand oder zum Formular „Neuen Tresor anlegen“ wird die bisherige Abfrage geschlossen und ihr Passwort geleert. Nur eine Abfrage ist gleichzeitig geöffnet; „Abbrechen“ entfernt keinen Zwischenstand. Die Zwischenstände bleiben voneinander getrennt.
-
-**EN:** Each recovery draft has its own expandable password prompt immediately below its action buttons. Selecting a different draft or the Create vault form closes the previous prompt and clears its password. Only one prompt is open at a time; Cancel never deletes a draft. Drafts remain independent.
-
-## Trennlinie in der Wiederherstellung / Recovery divider
-
-**DE:** Die aufgeklappte Master-Passwortabfrage gehört optisch zum ausgewählten Zwischenstand: Zwischen dessen Aktionsbuttons und dem Passwortfeld erscheint keine zusätzliche Trennlinie. Die Trennlinie zum nächsten Zwischenstand bleibt erhalten.
-
-**EN:** The expanded master-password prompt is visually grouped with its selected draft: there is no additional divider between that draft’s action buttons and its password field. The divider separating the next draft remains.
-
-
-## Import-Hinweisfarbe / Import notification color
-
-**DE:** Nach dem Übernehmen von Einträgen erscheint der Hinweis „Einträge übernommen. Nicht gespeichert“ orange, im selben Orangeton wie der Status oben rechts. Die Import- und Speicherlogik sowie echte Fehlermeldungen bleiben unverändert.
-
-**EN:** After applying imported entries, the “Entries applied. Not saved” notification is orange, matching the save-status badge at the top right. Import and saving behavior and genuine error notifications are unchanged.
-
-
-### Startseite / Home screen
-DE: Nach Auswahl einer .enc-Datei erscheint die Master-Passwortabfrage direkt unter „.enc-Datei öffnen“ mit Augen-Symbol und Abbrechen. Beim Wechsel zu einem anderen Startseitenformular wird die Eingabe gelöscht. Die Entschlüsselung und Notfall-Wiederherstellung bleiben unverändert.
-
-EN: After selecting an .enc file, the master-password prompt expands directly beneath “Open .enc file”, with a visibility toggle and Cancel. Switching to another home-screen form clears the input. Decryption and emergency recovery behavior remain unchanged.
-
-
-## Kompakte Startseitenformulare / Compact home-screen forms
-
-**DE:** In den aufgeklappten Formularen für „.enc-Datei öffnen“ und „Neuen Tresor anlegen“ entfallen die wiederholten Überschriften „Tresor öffnen“ bzw. „Neuen Tresor anlegen“. Nach der bestehenden Trennlinie beginnt jeweils direkt das Master-Passwortfeld. Die Aktionsbuttons, Passwortprüfung und übrige Darstellung bleiben unverändert.
-
-**EN:** The expanded “Open .enc file” and “Create new vault” forms no longer repeat their respective headings (“Open vault” and “Create new vault”). Each form begins with the master-password field immediately after the existing divider. Action buttons, password validation and the remaining layout are unchanged.
-
-
-## Anwendungsname / Application name
-
-**DE:** Die sichtbare Überschrift und der Browser-Tab heißen jetzt „🔐 Web-Passwortmanager“ bzw. „Web-Passwortmanager“. Die bisherigen Zusätze „3.0“ und „Browser-Testversion“ wurden aus diesen Anzeigen entfernt. Die interne Versionshistorie und die Funktionalität bleiben unverändert.
-
-**EN:** The visible heading and browser tab are now named “🔐 Web-Passwortmanager” and “Web-Passwortmanager”, respectively. The previous “3.0” and “Browser test version” labels have been removed from these displays. Internal version history and functionality are unchanged.
-
-
-### Überschrift / Heading (2026-09-24)
-
-**DE:** Die sichtbare Überschrift lautet jetzt „🔐 Web Passwort Manager“ (mit Leerzeichen) und ist etwas größer (2 rem), angelehnt an Version 2.0. Der Browser-Tab lautet „Web Passwort Manager“. An Funktionen und anderen Ansichten wurde nichts geändert.
-
-**EN:** The visible heading now reads “🔐 Web Passwort Manager” (with spaces) and is slightly larger (2 rem), matching the version 2.0 style. The browser tab reads “Web Passwort Manager”. No functionality or other views were changed.
-
-
-### Scrollbare Passwortliste / Scrollable password list
-
-DE: Die Passwortkarten werden ab einer maximalen Listenhöhe von 340 px (mobil: 280 px) innerhalb der Liste gescrollt. Suche, Sortierung, Aktionen und Speicherstatus bleiben außerhalb des Scrollbereichs. Das Drei-Punkte-Menü wird über der Liste angezeigt und beim Scrollen geschlossen.
-
-EN: Password cards scroll inside their own list after reaching a maximum height of 340 px (280 px on mobile). Search, sorting, actions, and save status stay outside the scroll area. The three-dot menu floats above the list and closes when scrolling.
-
-
-### Passwortliste: drei Einträge sichtbar / Password list: three entries visible
-
-DE: Die maximale Höhe der scrollbaren Passwortliste wurde auf 420 px (schmale Bildschirme: 440 px) erhöht, damit drei Eintragskarten in der üblichen Darstellung vollständig sichtbar sind. Bei längeren Einträgen oder abweichender Schriftgröße kann weiterhin Scrollen nötig sein.
-
-EN: The scrollable password list maximum height was increased to 420 px (narrow screens: 440 px) to fit three complete entry cards in the usual layout. Longer entries or different font sizes may still require scrolling.
-
-
-### Sortierung nach Eintragsdatum / Entry date sorting
-
-DE: Das Sortierfeld bietet zusätzlich „Zuletzt hinzugefügt“ und „Zuletzt geändert“. Neue Einträge erhalten Erstellungs- und Änderungszeitpunkt; bearbeitete Einträge erhalten einen neuen Änderungszeitpunkt. Beim Import erhalten neu übernommene Einträge den Zeitpunkt der Übernahme; bei ersetzten Einträgen bleibt ein vorhandener Erstellungszeitpunkt erhalten und der Änderungszeitpunkt wird aktualisiert. Diese Metadaten werden im verschlüsselten Tresor gespeichert und müssen wie andere Änderungen gespeichert bzw. geprüft werden. Für ältere Einträge ohne Zeitstempel werden keine historischen Daten erfunden: Sie erscheinen bei den Datumssortierungen nach Einträgen mit bekanntem Datum in ihrer bisherigen Reihenfolge. Die Sortierauswahl selbst ändert den Tresor nicht.
-
-EN: The sort menu now includes “Recently added” and “Recently changed”. New entries receive creation and modification timestamps; editing updates the modification timestamp. Newly imported entries receive the import time; replacing an entry preserves its known creation time and updates its modification time. This metadata is stored in the encrypted vault and must be saved/verified like other changes. Older entries without timestamps retain unknown dates and appear after dated entries in their original order. Changing the sort selection does not modify the vault.
-
-
-### Kompakte Sperransicht / Compact locked-vault view
-
-DE: Die Ansicht „Tresor gesperrt“ ist jetzt wie die Tresorauswahl auf maximal 500 px Breite begrenzt und mittig ausgerichtet. Der doppelte Sperrhinweis wurde entfernt; die beiden Aktionen stehen untereinander in voller Breite. Die Entsperrlogik bleibt unverändert.
-
-EN: The locked-vault screen now matches the vault selector’s centered 500 px maximum width. The redundant locked message was removed, and the two actions are stacked at full width. Unlock behavior is unchanged.
-
-
-### Verdeckte Master-Passwortabfragen / Masked master-password prompts
-DE: Beim Importieren, Synchronisieren und Prüfen einer .enc-Datei erscheint anstelle des Browser-`prompt()` ein eigener Dialog. Das Passwort ist standardmäßig verdeckt, kann mit dem Augen-Symbol angezeigt werden und wird beim Schließen geleert. Die Datei- und Tresorprüfung bleibt unverändert.
-
-EN: Importing, synchronizing and verifying an .enc file now use an in-app password dialog instead of the browser `prompt()`. Passwords are masked by default, can be revealed using the eye button, and are cleared when the dialog closes. File and vault validation remain unchanged.
-
-
-### Einheitliches Passwortfeld im Dialog / Single password field in dialog
-
-DE: Die Master-Passwortdialoge für Import, Synchronisierung und .enc-Prüfung zeigen nur noch einen rechteckigen Feldrahmen. Das innere Eingabefeld hat keinen eigenen Rahmen und keine ovale Darstellung; das Augen-Symbol bleibt rechts innerhalb des gemeinsamen Feldes. Passwortprüfung und Dialogablauf bleiben unverändert.
-
-EN: The master-password dialogs for import, synchronization and .enc verification now display one rectangular field border. The inner input has no separate border or pill styling; the visibility icon remains inside the shared field on the right. Password validation and dialog flow are unchanged.
+[↑ Back to language selection](#-web-passwort-manager)
