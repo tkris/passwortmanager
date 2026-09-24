@@ -175,3 +175,9 @@ EN: Vault selection, opening, locked and open vault views share the same respons
 **DE:** Jeder Zwischenstand hat eine eigene, unmittelbar unter seinen Aktionsbuttons angeordnete aufklappbare Passwortabfrage. Beim Wechsel zu einem anderen Zwischenstand oder zum Formular „Neuen Tresor anlegen“ wird die bisherige Abfrage geschlossen und ihr Passwort geleert. Nur eine Abfrage ist gleichzeitig geöffnet; „Abbrechen“ entfernt keinen Zwischenstand. Die Zwischenstände bleiben voneinander getrennt.
 
 **EN:** Each recovery draft has its own expandable password prompt immediately below its action buttons. Selecting a different draft or the Create vault form closes the previous prompt and clears its password. Only one prompt is open at a time; Cancel never deletes a draft. Drafts remain independent.
+
+## Trennlinie in der Wiederherstellung / Recovery divider
+
+**DE:** Die aufgeklappte Master-Passwortabfrage gehört optisch zum ausgewählten Zwischenstand: Zwischen dessen Aktionsbuttons und dem Passwortfeld erscheint keine zusätzliche Trennlinie. Die Trennlinie zum nächsten Zwischenstand bleibt erhalten.
+
+**EN:** The expanded master-password prompt is visually grouped with its selected draft: there is no additional divider between that draft’s action buttons and its password field. The divider separating the next draft remains.
