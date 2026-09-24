@@ -215,3 +215,10 @@ EN: After selecting an .enc file, the master-password prompt expands directly be
 **DE:** Die sichtbare Überschrift lautet jetzt „🔐 Web Passwort Manager“ (mit Leerzeichen) und ist etwas größer (2 rem), angelehnt an Version 2.0. Der Browser-Tab lautet „Web Passwort Manager“. An Funktionen und anderen Ansichten wurde nichts geändert.
 
 **EN:** The visible heading now reads “🔐 Web Passwort Manager” (with spaces) and is slightly larger (2 rem), matching the version 2.0 style. The browser tab reads “Web Passwort Manager”. No functionality or other views were changed.
+
+
+### Scrollbare Passwortliste / Scrollable password list
+
+DE: Die Passwortkarten werden ab einer maximalen Listenhöhe von 340 px (mobil: 280 px) innerhalb der Liste gescrollt. Suche, Sortierung, Aktionen und Speicherstatus bleiben außerhalb des Scrollbereichs. Das Drei-Punkte-Menü wird über der Liste angezeigt und beim Scrollen geschlossen.
+
+EN: Password cards scroll inside their own list after reaching a maximum height of 340 px (280 px on mobile). Search, sorting, actions, and save status stay outside the scroll area. The three-dot menu floats above the list and closes when scrolling.
