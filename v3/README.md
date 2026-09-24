@@ -191,3 +191,39 @@ EN: Copy icons are aligned at the right edge of password cards at all viewport w
 DE: Bestätigungen für Löschen, Wiederherstellen, Synchronisieren, Master-Passwortwechsel und Schließen ohne Speichern erscheinen als Dialoge im App-Design. „Sitzung verwerfen“ löscht nur den verschlüsselten Browser-Zwischenstand; bestehende .enc-Dateien bleiben unverändert. Abbrechen und Escape führen keine bestätigte Aktion aus.
 
 EN: Confirmations for deleting, restoring, synchronizing, changing the master password and closing without saving use in-app dialogs. “Discard session” deletes only the encrypted browser draft, not existing .enc files. Cancel and Escape do not confirm an action.
+
+
+## Bidirektionale Tresor-Synchronisierung (Testversion)
+
+Die Synchronisierung vergleicht den geöffneten Tresor mit einer zweiten .enc-Datei anhand von Website/URL und Benutzername. Einträge, die nur auf einer Seite vorhanden sind, werden ergänzt. Bei unterschiedlichen Fassungen wählst du die geöffnete, die zweite oder beide Versionen (mit unterscheidbarem Benutzernamen). Das Ergebnis wird für beide Tresore mit den jeweils bisherigen Schlüsseln verschlüsselt und über zwei separate, wiederholbare Download-Buttons angeboten. Die ursprünglichen Dateien werden nicht automatisch überschrieben. **Bei dieser Synchronisierungsfunktion gibt es keine zusätzliche Downloadprüfung.** Ein angebotener Download beweist nicht, dass die Datei gespeichert wurde. Der geöffnete Tresor bleibt bis zur regulären Speicherung/Prüfung als ungespeichert markiert; die verschlüsselte Sitzungswiederherstellung bleibt erhalten. Die Importfunktion bleibt einseitig.
+
+## Bidirectional vault synchronization (test version)
+
+Synchronization compares the open vault with a second .enc file using website/URL and username. Entries present on only one side are added to the other. For conflicting entries, choose the open version, the second version, or keep both (using a distinguishable username). The merged entries are encrypted separately with each vault's existing key and offered via two independent, repeatable download buttons. Original files are not automatically overwritten. **This synchronization workflow does not require a post-download verification.** Offering a download does not prove that the file was saved. The open vault remains marked unsaved until the normal save/verification flow completes, and encrypted session recovery is retained. Import remains one-way.
+
+
+### Synchronisierung: Auswahl / Synchronization: choices
+
+DE: Konflikte werden orange markiert und einzeln oder gesammelt entschieden. Einträge, die nur in einem Tresor vorhanden sind, können einzeln oder gesammelt übernommen bzw. abgewählt werden. „Synchronisierte Tresore erstellen“ erstellt die zwei separat herunterladbaren .enc-Dateien; die Ansicht „Tresore zum Sichern bereit“ bietet wiederholbare Downloads. Abgewählte einzelne Einträge fehlen im gemeinsamen Ergebnis und damit in beiden neu erstellten Dateien. Vorhandene Dateien werden nicht automatisch überschrieben.
+
+EN: Conflicts are highlighted in orange and can be resolved individually or in bulk. Entries found in only one vault can be included or excluded individually or in bulk. “Synchronisierte Tresore erstellen” creates two separately downloadable .enc files; “Tresore zum Sichern bereit” provides repeatable downloads. Excluded one-sided entries are absent from the merged result and therefore from both newly generated files. Existing files are never overwritten automatically.
+
+
+### Synchronisierungsansicht / Synchronization view
+
+DE: Konflikte erscheinen zuerst in orange markierten Vergleichskarten; die Website und identische Benutzernamen werden nicht in beiden Spalten wiederholt. Einträge, die nur in einem Tresor vorkommen, erscheinen darunter als kompakte Karten mit Herkunft und individueller Auswahl „In beide Tresore übernehmen“. Beim Abwählen wird darauf hingewiesen, dass der Eintrag in beiden neu erzeugten Dateien fehlt. Die Sammelauswahl und getrennten, wiederholbaren Downloads bleiben erhalten.
+
+EN: Conflicts appear first in orange comparison cards; shared website and username values are not repeated in both columns. Entries present in only one vault appear below as compact cards with their origin and an individual “Include in both vaults” choice. Deselecting an entry warns that it will be absent from both newly generated files. Bulk selection and separate repeatable downloads remain available.
+
+
+### Herkunftsmarkierung bei der Synchronisierung / Sync origin indicators
+
+DE: Bei Einträgen ohne Konflikt zeigen zwei nebeneinanderstehende Felder die Herkunft: Geöffneter Tresor = erste Datei, Zweiter Tresor = zweite .enc-Datei. ✓ bedeutet vorhanden, – bedeutet fehlt. Die Entscheidung „In beide Tresore übernehmen“ bleibt unabhängig davon auswählbar.
+
+EN: For entries without conflicts, two side-by-side indicators show the origin: Left = open vault, Right = second .enc file. ✓ means present, – means absent. The “Include in both vaults” choice remains independently selectable.
+
+### Einheitliche Synchronisierungskarten / Consistent synchronization cards
+
+DE: Einträge ohne Konflikt verwenden dieselbe zweispaltige Tresoransicht wie Konflikte, jedoch ohne orange Hervorhebung. Website und Benutzername stehen einmal oberhalb der Spalten. Eine fehlende Fassung wird als „Eintrag nicht vorhanden“ angezeigt. Die Einzelauswahl und ihre Auswirkung auf beide neu erstellten Dateien bleiben unverändert.
+
+EN: Non-conflicting entries use the same two-column vault layout as conflicts, without orange highlighting. Website and username appear once above the columns. A missing entry is labelled “Eintrag nicht vorhanden” (entry not present). Per-entry selection and its effect on both newly generated files remain unchanged.
