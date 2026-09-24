@@ -229,3 +229,10 @@ EN: Password cards scroll inside their own list after reaching a maximum height 
 DE: Die maximale Höhe der scrollbaren Passwortliste wurde auf 420 px (schmale Bildschirme: 440 px) erhöht, damit drei Eintragskarten in der üblichen Darstellung vollständig sichtbar sind. Bei längeren Einträgen oder abweichender Schriftgröße kann weiterhin Scrollen nötig sein.
 
 EN: The scrollable password list maximum height was increased to 420 px (narrow screens: 440 px) to fit three complete entry cards in the usual layout. Longer entries or different font sizes may still require scrolling.
+
+
+### Sortierung nach Eintragsdatum / Entry date sorting
+
+DE: Das Sortierfeld bietet zusätzlich „Zuletzt hinzugefügt“ und „Zuletzt geändert“. Neue Einträge erhalten Erstellungs- und Änderungszeitpunkt; bearbeitete Einträge erhalten einen neuen Änderungszeitpunkt. Beim Import erhalten neu übernommene Einträge den Zeitpunkt der Übernahme; bei ersetzten Einträgen bleibt ein vorhandener Erstellungszeitpunkt erhalten und der Änderungszeitpunkt wird aktualisiert. Diese Metadaten werden im verschlüsselten Tresor gespeichert und müssen wie andere Änderungen gespeichert bzw. geprüft werden. Für ältere Einträge ohne Zeitstempel werden keine historischen Daten erfunden: Sie erscheinen bei den Datumssortierungen nach Einträgen mit bekanntem Datum in ihrer bisherigen Reihenfolge. Die Sortierauswahl selbst ändert den Tresor nicht.
+
+EN: The sort menu now includes “Recently added” and “Recently changed”. New entries receive creation and modification timestamps; editing updates the modification timestamp. Newly imported entries receive the import time; replacing an entry preserves its known creation time and updates its modification time. This metadata is stored in the encrypted vault and must be saved/verified like other changes. Older entries without timestamps retain unknown dates and appear after dated entries in their original order. Changing the sort selection does not modify the vault.
